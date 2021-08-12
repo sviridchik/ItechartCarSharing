@@ -1,6 +1,6 @@
 
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path,include,re_path
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -16,5 +16,7 @@ urlpatterns = [
     path('users/signin',TokenObtainPairView.as_view()),
     path('users/signup', views.SignUp.as_view()),
     path('users/logout',views.LogoutApiView.as_view()),
-    path('users/get',views.users_get),
+    path('users/',views.users_get),
+    re_path('users/(?P<pk>\d)|(?P<me>me)', views.users_get_pk),
+
 ]
