@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ['date_of_birth', 'email', 'dtp_times', 'username', 'password']
+        fields = ('date_of_birth', 'email', 'dtp_times', 'username', 'password')
 
     def save(self, **kwargs):
         ps = make_password(self.data['password'])
