@@ -41,3 +41,22 @@ class LogoutSerializer(serializers.Serializer):
             RefreshToken(self.token).blacklist()
         except TokenError:
             self.fail('bad_token')
+
+class PriceSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only = True)
+    price_for_km = serializers.FloatField(min_value = 0)
+    night_add = serializers.FloatField(min_value=0)
+    price_dtp = serializers.FloatField(min_value=0)
+    parking_price = serializers.FloatField(min_value=0)
+    booking_price = serializers.FloatField(min_value=0)
+
+
+    class Meta:
+        model = Price
+        fields = ['id','price_for_km', 'night_add', 'price_dtp', 'parking_price', 'booking_price','description']
+
+    # def save(self, **kwargs):
+    #     # if self.data['price_for_km'] >=0 and self.data['night_add'] >=0 and self.data['price_dtp'] >=0 and self.data['parking_price'] >=0 and self.data['booking_price'] >=0:
+    #     price = Price.objects.create(price_for_km=self.data['price_for_km'], night_add=self.data['night_add'],price_dtp=self.data['price_dtp'],parking_price=self.data['parking_price'],booking_price=self.data['booking_price'],description=self.data['description'], )
+    #     return price
+
