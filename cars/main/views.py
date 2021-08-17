@@ -7,11 +7,13 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework.mixins import CreateModelMixin
-from rest_framework.generics import GenericAPIView, CreateAPIView
+from rest_framework.generics import GenericAPIView, CreateAPIView, ListCreateAPIView
 from django.contrib.auth.hashers import make_password
 from .serializer import *
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.urls import reverse
+from math import cos, asin, sqrt, pi
+
 from .models import *
 
 
@@ -329,7 +331,7 @@ class CarList(CreateAPIView):
 
         if not self.is_admin(request=request):
             return Response({"error": "no rights"}, status=status.HTTP_401_UNAUTHORIZED)
-
+        # raise Exception(request.data)
         serializer = CarSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -387,4 +389,110 @@ class CarListDetail(APIView):
             return Response({"error": "no rights"}, status=status.HTTP_401_UNAUTHORIZED)
         car = self.get_object(pk)
         car.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# class CarsFreeList(APIView):
+#     model = Cars
+#     serializer_class = CarSerializer
+#
+#
+#
+#     def get_queryset(self):
+#         queryset = Cars.objects.all()
+#         latitude = self.request.query_params.get('latitude')
+#         longitude = self.request.query_params.get('Latitude')
+#
+#         distance = self.request.query_params.get('distance')
+#         class_car = self.request.query_params.get('class')
+#
+#         # raise Exception(class_car, latitude*2)
+#
+#         # if workspace:
+#         #     queryset = queryset.filter(workspace_id=workspace)
+#         # elif airline:
+#         #     queryset = queryset.filter(workspace__airline_id=airline)
+
+        # return queryset
+# Хаверсин
+def haversin(lat1, lon1, lat2, lon2):
+    p = pi/180
+    a = 0.5 - cos((lat2-lat1)*p)/2 + cos(lat1*p) * cos(lat2*p) * (1-cos((lon2-lon1)*p))/2
+    return 12742 * asin(sqrt(a))
+
+
+@api_view(['GET'])
+def get_free_cars(request):
+
+    latitude = float(request.query_params.get('latitude'))
+    longitude = float(request.query_params.get('longitude'))
+    distance = float(request.query_params.get('distance'))
+    class_car = request.query_params.get('class')
+    ordering = request.query_params.get('ordering')
+    disc_flag = False
+    # user = request.user
+
+    res = []
+    free_cars = Cars.objects.filter(status = "free")
+    for free_car in free_cars:
+        car_lat = free_car.latitude
+        car_lon = free_car.longitude
+        s = haversin(latitude,longitude,car_lat,car_lon)
+        if s<=distance and free_car.car_class.name == class_car:
+            data_viewed = {}
+            res.append({"car":dict(CarSerializer(free_car).data),"distance":s})
+            data_viewed['car'] = free_car.id
+            data_viewed['price_day'] = free_car.car_class.price.price_for_km
+            data_viewed['price_night'] = free_car.car_class.price.price_for_km+free_car.car_class.price.night_add
+            # data_viewed['user'] = Profile.objects.get(user = user).id
+            data_viewed['user'] = None
+
+            data_viewed['booking_price'] = free_car.car_class.price.booking_price
+
+            serializer = ViewedCarSerializer(data=data_viewed)
+            if serializer.is_valid():
+                serializer.save()
+    
+
+    if ordering[0] == '-':
+        disc_flag = True
+
+    res.sort(key=lambda el:el["distance"],reverse=disc_flag)
+    return Response(res, status=status.HTTP_200_OK)
+
+
+# -------- Viewed cars -----------
+class ViewedCarList(CreateAPIView):
+    queryset = ViewedCars.objects.all()
+    serializer_class = ViewedCarSerializer
+    # permission_classes = [IsAuthenticated]
+
+
+    def get(self, request, format=None):
+        car = ViewedCars.objects.all()
+        serializer = ViewedCarSerializer(car, many=True)
+        # raise Exception(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class ViewedCarListDetail(APIView):
+    queryset = ViewedCars.objects.all()
+    serializer_class = ViewedCarSerializer
+    # permission_classes = [IsAuthenticated]
+
+
+    def get_object(self, pk):
+        # Returns an object instance that should
+        # be used for detail views.
+        try:
+            return ViewedCars.objects.get(pk=pk)
+        except ViewedCars.DoesNotExist:
+            return Response({"error": "there is no such price"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        # if not self.is_admin(request=request):
+        #     return Response({"error": "no rights"}, status=status.HTTP_401_UNAUTHORIZED)
+        car = self.get_object(pk)
+        cars = ViewedCars.objects.all()
+        for car in cars:
+            car.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
