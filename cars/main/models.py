@@ -62,3 +62,13 @@ class Profile(models.Model):
     email = models.CharField(max_length=255, verbose_name="email")
     is_admin = models.BooleanField(verbose_name='is_admin', default=False)
     dtp_times = models.IntegerField(verbose_name='dtp_times', default=0)
+    
+class ViewedCars(models.Model):
+    id = models.IntegerField(primary_key=True, auto_created=True, verbose_name='id')
+    car = models.ForeignKey(Cars,on_delete=models.SET_NULL,null = True)
+    price_day = models.IntegerField(blank=False)
+    price_night = models.IntegerField(blank=False)
+    user = models.ForeignKey(Profile,on_delete=models.SET_NULL,null = True)
+    booking_price = models.IntegerField(blank=False)
+
+    
