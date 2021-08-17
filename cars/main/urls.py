@@ -30,4 +30,9 @@ urlpatterns = [
     path('cars/', views.CarList.as_view()),
     path('cars/<int:pk>', views.CarListDetail.as_view()),
 
+    path('cars/free/',views.get_free_cars),
+    # path('/cars/free/?latitude=<latitude>&longitude=<longitude>&distance =<distance>&class=<class>ordering= distance')
+    path('cars/view/',views.ViewedCarList.as_view()),
+    path('cars/view/<int:pk>', views.ViewedCarListDetail.as_view()),
+
 ]
