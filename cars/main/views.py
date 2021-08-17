@@ -444,8 +444,8 @@ def get_free_cars(request):
             data_viewed['car'] = free_car.id
             data_viewed['price_day'] = free_car.car_class.price.price_for_km
             data_viewed['price_night'] = free_car.car_class.price.price_for_km+free_car.car_class.price.night_add
-            # data_viewed['user'] = Profile.objects.get(user = user).id
-            data_viewed['user'] = None
+            data_viewed['user'] = Profile.objects.get(user = user).id
+            #data_viewed['user'] = None
 
             data_viewed['booking_price'] = free_car.car_class.price.booking_price
 
