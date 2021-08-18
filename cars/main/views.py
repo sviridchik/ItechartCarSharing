@@ -430,7 +430,7 @@ def get_free_cars(request):
     class_car = request.query_params.get('class')
     ordering = request.query_params.get('ordering')
     disc_flag = False
-    # user = request.user
+    user = request.user
 
     res = []
     free_cars = Cars.objects.filter(status = "free")
