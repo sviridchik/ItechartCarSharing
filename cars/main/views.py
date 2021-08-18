@@ -161,7 +161,7 @@ class PriceList(CreateAPIView):
     queryset = Price.objects.all()
     serializer_class = PriceSerializer
 
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def is_admin(self, request):
         pk_user = request.user.id
@@ -173,8 +173,8 @@ class PriceList(CreateAPIView):
 
     def post(self, request):
 
-        # if not self.is_admin(request=request):
-        #     return Response({"error": "no rights"}, status=status.HTTP_401_UNAUTHORIZED)
+        if not self.is_admin(request=request):
+            return Response({"error": "no rights"}, status=status.HTTP_401_UNAUTHORIZED)
 
         serializer = PriceSerializer(data=request.data)
         if serializer.is_valid():
@@ -242,7 +242,7 @@ class ClassList(CreateAPIView):
     queryset = Class_car.objects.all()
     serializer_class = ClassSerializer
 
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def is_admin(self, request):
         pk_user = request.user.id
@@ -254,8 +254,8 @@ class ClassList(CreateAPIView):
 
     def post(self, request):
 
-        # if not self.is_admin(request=request):
-        #     return Response({"error": "no rights"}, status=status.HTTP_401_UNAUTHORIZED)
+        if not self.is_admin(request=request):
+            return Response({"error": "no rights"}, status=status.HTTP_401_UNAUTHORIZED)
 
         serializer = ClassSerializer(data=request.data)
         if serializer.is_valid():
@@ -402,6 +402,7 @@ def haversin(lat1, lon1, lat2, lon2):
 
 @api_view(['GET'])
 def get_free_cars(request):
+
     latitude = float(request.query_params.get('latitude'))
     longitude = float(request.query_params.get('longitude'))
     distance = float(request.query_params.get('distance'))
@@ -414,6 +415,8 @@ def get_free_cars(request):
 
     res = []
     free_cars = Cars.objects.filter(status="free")
+    # raise Exception(free_cars)
+
 
     already_seen = []
     cars_already_seen = ViewedCars.objects.all()
@@ -440,7 +443,6 @@ def get_free_cars(request):
                 serializer = ViewedCarSerializer(data=data_viewed)
                 if serializer.is_valid():
                     serializer.save()
-
     if ordering[0] == '-':
         disc_flag = True
 
@@ -504,7 +506,8 @@ def to_book(request, pk):
     Cars.objects.filter(pk=pk).update(status="active")
 
     # create trip price
-    viewd_car = ViewedCars.objects.filter(user=user, car=pk)
+    user_profile = Profile.objects.get(user=user)
+    viewd_car = ViewedCars.objects.filter(user=user_profile, car=pk)
     # viewd_car = ViewedCars.objects.filter(car=pk)
     if len(viewd_car) == 0:
         return Response({"error": "no unavailable cars"}, status=status.HTTP_400_BAD_REQUEST)
