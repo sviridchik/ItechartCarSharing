@@ -89,7 +89,7 @@ class TripSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Trip
-        fields = ('id', 'car', 'trip_price', 'is_active', 'user', 'final_price')
+        fields = ('id', 'car', 'trip_price', 'is_active', 'user', 'final_price','is_booked')
         read_only_fields = ('id',)
 
 

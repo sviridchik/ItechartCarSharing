@@ -95,6 +95,7 @@ class Trip(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True)
     car = models.ForeignKey(Cars, on_delete=models.SET_NULL, null=True)
     is_active = models.BooleanField(default=False)
+    is_booked = models.BooleanField(default=False)
     final_price = models.IntegerField(blank=True,null=True)
 
 

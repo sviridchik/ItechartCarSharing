@@ -1243,9 +1243,71 @@ req_test_health = {}
 #         self.assertEqual(response.status_code, 200)
 #
 #
+#
+#
+# class Car_book_test(APITestCase):
+#     payload_car = {
+#         "level_consumption": 2,
+#         "mark": "Mercedes-Benz",
+#         "reg_number": "MP31523",
+#         "color": "w",
+#         "year": 2000,
+#         "latitude": 55.0,
+#         "status": "free",
+#         "car_class": 1,
+#         "longitude": 37.0}
+#
+#     def setUp(self):
+#         self.user = self.client.post('/users/signup',
+#                                      data={'username': 'test123', 'password': 'test123123', "dtp_times": 9,
+#                                            "email": "test@gmail.com", "date_of_birth": "2003-09-09"})
+#
+#         response = self.client.post('/users/signin', data={'username': 'test123', 'password': 'test123123'})
+#         self.token = response.data['access']
+#         payload = {
+#             "price_for_km": 23,
+#             "night_add": 13,
+#             "price_dtp": 8,
+#             "parking_price": 9,
+#             "booking_price": 23,
+#             "description": "very informative"
+#         }
+#
+#         self.api_authentication()
+#         Profile.objects.all().update(is_admin=True)
+#         response = self.client.post('/price/', data=payload)
+#
+#         response = self.client.post('/class/', data={
+#             "id": 1,
+#             "name": "economy",
+#             "price": 1,
+#             "booking_time": 15
+#         })
+#         response = self.client.post('/cars/', data=Car_book_test.payload_car)
+#
+#         Profile.objects.all().update(is_admin=False)
+#
+#     def api_authentication(self):
+#         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
+#
+#     def test_cars(self):
+#         self.api_authentication()
+#         Profile.objects.all().update(is_admin=True)
+#
+#         response = self.client.get('/cars/free/?latitude=55&longitude=37&distance=100&class=economy&ordering=distance')
+#
+#         id_car = ViewedCars.objects.all()[0].id
+#         response1 = self.client.post('/cars/{}/book'.format(id_car))
+#
+#         self.assertEqual(response1.status_code, 200)
+#         self.assertEqual(Cars.objects.get(pk=id_car).status, "booked")
+#         self.assertNotEqual(len(TripPrice.objects.all()), 0)
+#         self.assertNotEqual(len(TripLog.objects.all()), 0)
+#         self.assertEqual(len(ViewedCars.objects.all()), 0)
+#
 
 
-class Car_book_test(APITestCase):
+class Trip_start_test(APITestCase):
     payload_car = {
         "level_consumption": 2,
         "mark": "Mercedes-Benz",
@@ -1283,14 +1345,14 @@ class Car_book_test(APITestCase):
             "price": 1,
             "booking_time": 15
         })
-        response = self.client.post('/cars/', data=Car_book_test.payload_car)
+        response = self.client.post('/cars/', data=Trip_start_test.payload_car)
 
         Profile.objects.all().update(is_admin=False)
 
     def api_authentication(self):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
 
-    def test_cars(self):
+    def test_cars_booked(self):
         self.api_authentication()
         Profile.objects.all().update(is_admin=True)
 
@@ -1298,8 +1360,111 @@ class Car_book_test(APITestCase):
 
         id_car = ViewedCars.objects.all()[0].id
         response1 = self.client.post('/cars/{}/book'.format(id_car))
+        response2 = self.client.post('/trip/start/{}'.format(id_car))
 
-        self.assertEqual(response1.status_code, 200)
+        self.assertEqual(response2.status_code, 200)
+        self.assertEqual(Cars.objects.get(pk=id_car).status, "active")
+        self.assertNotEqual(len(TripPrice.objects.all()), 0)
+        self.assertNotEqual(len(TripLog.objects.all()), 0)
+        self.assertEqual(len(ViewedCars.objects.all()), 0)
+
+    def test_cars_not_booked(self):
+        self.api_authentication()
+        Profile.objects.all().update(is_admin=True)
+
+        response = self.client.get('/cars/free/?latitude=55&longitude=37&distance=100&class=economy&ordering=distance')
+
+        id_car = ViewedCars.objects.all()[0].id
+        response2 = self.client.post('/trip/start/{}'.format(id_car))
+
+        self.assertEqual(response2.status_code, 200)
+        self.assertEqual(Cars.objects.get(pk=id_car).status, "active")
+        self.assertNotEqual(len(TripPrice.objects.all()), 0)
+        self.assertNotEqual(len(TripLog.objects.all()), 0)
+        self.assertEqual(len(ViewedCars.objects.all()), 0)
+
+
+class Logs_test(APITestCase):
+    payload_car = {
+        "level_consumption": 2,
+        "mark": "Mercedes-Benz",
+        "reg_number": "MP31523",
+        "color": "w",
+        "year": 2000,
+        "latitude": 55.0,
+        "status": "free",
+        "car_class": 1,
+        "longitude": 37.0}
+
+    def setUp(self):
+        self.user = self.client.post('/users/signup',
+                                     data={'username': 'test123', 'password': 'test123123', "dtp_times": 9,
+                                           "email": "test@gmail.com", "date_of_birth": "2003-09-09"})
+
+        response = self.client.post('/users/signin', data={'username': 'test123', 'password': 'test123123'})
+        self.token = response.data['access']
+        payload = {
+            "price_for_km": 23,
+            "night_add": 13,
+            "price_dtp": 8,
+            "parking_price": 9,
+            "booking_price": 23,
+            "description": "very informative"
+        }
+
+        self.api_authentication()
+        Profile.objects.all().update(is_admin=True)
+        response = self.client.post('/price/', data=payload)
+
+        response = self.client.post('/class/', data={
+            "id": 1,
+            "name": "economy",
+            "price": 1,
+            "booking_time": 15
+        })
+        response = self.client.post('/cars/', data=Trip_start_test.payload_car)
+
+        Profile.objects.all().update(is_admin=False)
+
+    def api_authentication(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
+
+    def test_logs_post_get(self):
+        self.api_authentication()
+        Profile.objects.all().update(is_admin=True)
+
+        response = self.client.get('/cars/free/?latitude=55&longitude=37&distance=100&class=economy&ordering=distance')
+
+        id_car = ViewedCars.objects.all()[0].id
+        response1 = self.client.post('/cars/{}/book'.format(id_car))
+        response2 = self.client.post('/trip/start/{}'.format(id_car))
+        id_trip = Trip.objects.filter(is_active = True)[0].id
+        # raise Exception()
+        response = self.client.post('trip/<int:pk>/logs'.format(id_trip))
+        response2 = self.client.get('trip/<int:pk>/logs'.format(id_trip))
+
+
+        self.assertEqual(response, 200)
+        self.assertEqual(response2.status_code, 200)
+
+
+        # self.assertEqual(Cars.objects.get(pk=id_car).status, "active")
+        # self.assertNotEqual(len(TripPrice.objects.all()), 0)
+        # self.assertNotEqual(len(TripLog.objects.all()), 0)
+        # self.assertEqual(len(ViewedCars.objects.all()), 0)
+
+
+
+    def test_cars_not_booked(self):
+        self.api_authentication()
+        Profile.objects.all().update(is_admin=True)
+
+        response = self.client.get('/cars/free/?latitude=55&longitude=37&distance=100&class=economy&ordering=distance')
+
+        id_car = ViewedCars.objects.all()[0].id
+        response2 = self.client.post('/trip/start/{}'.format(id_car))
+
+        self.assertEqual(response2.status_code, 200)
         self.assertEqual(Cars.objects.get(pk=id_car).status, "active")
         self.assertNotEqual(len(TripPrice.objects.all()), 0)
         self.assertNotEqual(len(TripLog.objects.all()), 0)

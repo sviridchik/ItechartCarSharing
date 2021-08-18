@@ -41,6 +41,9 @@ urlpatterns = [
     path('trip/trip_price', views.TripPriceList.as_view()),
     path('trip/trip_price/<int:pk>', views.TripPriceListDetail.as_view()),
 
-    path('trip/trip_log', views.LogList.as_view()),
+    # path('trip/trip_log', views.LogList.as_view()),
+    path('trip/start/<int:pk>', views.trip_start),
+    re_path('trip/(?P<pk>\d)/logs', views.post_logs),
+    re_path('trip/(?P<pk>\d)/logs/(?P<pk_log>\d)', views.TripLogListDetail.as_view()),
 
 ]
