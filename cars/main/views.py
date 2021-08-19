@@ -826,3 +826,56 @@ class TripLogListDetail(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+def users_get_trip_current( request,pk=None, me=None):
+    pk_user = request.user.id
+    user_profile = Profile.objects.get(pk=pk_user)
+    pk_target = None
+    if pk is not None:
+        pk = int(pk)
+        # not me ,then admin
+        if pk != pk_user:
+            if not is_admin(request=request):
+                return Response({"error": "no rights"}, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                pk_target = pk
+                is_admin_user = True
+        else:
+            pk_target = pk
+    elif me is not None:
+        pk_target = pk_user
+
+
+    trip= Trip.objects.filter(user = user_profile, is_active = True)[0]
+
+    serializer = TripSerializer(trip)
+    # raise Exception(trip)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+def users_get_trips(request, pk=None, me=None):
+    pk_user = request.user.id
+    user_profile = Profile.objects.get(pk=pk_user)
+    pk_target = None
+    if pk is not None:
+        pk = int(pk)
+        # not me ,then admin
+        if pk != pk_user:
+            if not is_admin(request=request):
+                return Response({"error": "no rights"}, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                pk_target = pk
+                is_admin_user = True
+        else:
+            pk_target = pk
+    elif me is not None:
+        pk_target = pk_user
+
+    trip = Trip.objects.filter(user=user_profile)
+    serializer = TripSerializer(trip, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+

@@ -16,7 +16,7 @@ urlpatterns = [
     path('users/signup', views.SignUp.as_view()),
     path('users/logout',views.LogoutApiView.as_view()),
     path('users/',views.users_get),
-    re_path('users/(?P<pk>\d)|(?P<me>me)', views.users_get_pk),
+    re_path('users/(?P<pk>\d)|(?P<me>me)$', views.users_get_pk),
 
     path('price', views.PriceList.as_view()),
     path('price/', views.PriceList.as_view()),
@@ -50,5 +50,8 @@ urlpatterns = [
     re_path('trip/(?P<pk>\d)/logs/(?P<pk_log>\d)', views.TripLogListDetail.as_view()),
 
     path('trip/finish/', views.trip_finish),
+
+    re_path('users/(?P<pk>\d)|(?P<me>me)/trip/current$', views.users_get_trip_current),
+    re_path('users/(?P<pk>\d)|(?P<me>me)/trips$', views.users_get_trips),
 
 ]
