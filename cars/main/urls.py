@@ -43,7 +43,12 @@ urlpatterns = [
 
     # path('trip/trip_log', views.LogList.as_view()),
     path('trip/start/<int:pk>', views.trip_start),
-    re_path('trip/(?P<pk>\d)/logs', views.post_logs),
+
+    # path('trip/<int:pk>/logs', views.post_get_logs),
+
+    re_path('trip/(?P<pk>\d)/logs$', views.post_get_logs),
     re_path('trip/(?P<pk>\d)/logs/(?P<pk_log>\d)', views.TripLogListDetail.as_view()),
+
+    path('trip/finish/', views.trip_finish),
 
 ]

@@ -402,7 +402,6 @@ def haversin(lat1, lon1, lat2, lon2):
 
 @api_view(['GET'])
 def get_free_cars(request):
-
     latitude = float(request.query_params.get('latitude'))
     longitude = float(request.query_params.get('longitude'))
     distance = float(request.query_params.get('distance'))
@@ -411,18 +410,12 @@ def get_free_cars(request):
     disc_flag = False
     user = request.user
 
-    # user = None
-
     res = []
     free_cars = Cars.objects.filter(status="free")
-    # raise Exception(free_cars)
-
 
     already_seen = []
     cars_already_seen = ViewedCars.objects.all()
     for car in cars_already_seen:
-        # if user is :
-        # already_seen.append((None,car.car.id))
         already_seen.append((car.user.id, car.car.id))
 
     for free_car in free_cars:
@@ -436,7 +429,6 @@ def get_free_cars(request):
             data_viewed['price_day'] = free_car.car_class.price.price_for_km
             data_viewed['price_night'] = free_car.car_class.price.price_for_km + free_car.car_class.price.night_add
             data_viewed['user'] = Profile.objects.get(user=user).id
-            # data_viewed['user'] = None
 
             data_viewed['booking_price'] = free_car.car_class.price.booking_price
             if (data_viewed['car'], data_viewed['user']) not in already_seen:
@@ -459,7 +451,6 @@ class ViewedCarList(CreateAPIView):
     def get(self, request, format=None):
         car = ViewedCars.objects.all()
         serializer = ViewedCarSerializer(car, many=True)
-        # raise Exception(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -470,8 +461,7 @@ class ViewedCarListDetail(APIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
-        # Returns an object instance that should
-        # be used for detail views.
+
         try:
             return ViewedCars.objects.get(pk=pk)
         except ViewedCars.DoesNotExist:
@@ -489,11 +479,10 @@ class ViewedCarListDetail(APIView):
 
 #     -------------- book -----------------------
 
-
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def to_book(request, pk):
     user = request.user
-    # user = None
     # car status change
     Cars.objects.filter(pk=pk).update(status="free")
 
@@ -508,17 +497,13 @@ def to_book(request, pk):
     # create trip price
     user_profile = Profile.objects.get(user=user)
     viewd_car = ViewedCars.objects.filter(user=user_profile, car=pk)
-    # viewd_car = ViewedCars.objects.filter(car=pk)
     if len(viewd_car) == 0:
         return Response({"error": "no unavailable cars"}, status=status.HTTP_400_BAD_REQUEST)
 
-    # raise Exception(viewd_car)
     data_trip_price = {}
     data_trip_price['price_day'] = viewd_car[0].price_day / 1.0
     data_trip_price['price_night'] = viewd_car[0].price_night / 1.0
     data_trip_price['booking_price'] = viewd_car[0].booking_price / 1.0
-
-    # raise Exception(data_trip_price['booking_price'])
 
     serializer = TripPriceSerializer(data=data_trip_price)
     if serializer.is_valid():
@@ -591,8 +576,7 @@ class TripPriceListDetail(APIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
-        # Returns an object instance that should
-        # be used for detail views.
+
         try:
             return TripPrice.objects.get(pk=pk)
         except TripPrice.DoesNotExist:
@@ -612,31 +596,18 @@ class TripPriceListDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# -------------- trip log ---------------------
-# class LogList(CreateAPIView):
-#     queryset = TripLog.objects.all()
-#     serializer_class = TripLogSerializer
-#
-#     permission_classes = [IsAuthenticated]
-#
-#     def get(self, request, format=None):
-#         trip = TripLog.objects.all()
-#         serializer = TripLogSerializer(trip, many=True)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-
-
 #     |||||||||||| trip ||||||||||||||||||||||
+
 @api_view(['POST'])
-def trip_start(request,pk):
+@permission_classes([IsAuthenticated])
+def trip_start(request, pk):
     user = request.user
     user_profile = Profile.objects.get(user=user)
     flag_book = False
     id_book = None
     trip_book = None
-#     check wheather there are another active trips
-    trips =  Trip.objects.filter(user=user_profile)
+    #     check wheather there are another active trips
+    trips = Trip.objects.filter(user=user_profile)
     car_work = Cars.objects.get(pk=pk)
     for trip in trips:
         if trip.is_booked:
@@ -649,17 +620,13 @@ def trip_start(request,pk):
     if not flag_book:
         # didn't booking then create trip price and trip
         viewd_car = ViewedCars.objects.filter(user=user_profile, car=pk)
-        # viewd_car = ViewedCars.objects.filter(car=pk)
         if len(viewd_car) == 0:
             return Response({"error": "no unavailable cars"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # raise Exception(viewd_car)
         data_trip_price = {}
         data_trip_price['price_day'] = viewd_car[0].price_day / 1.0
         data_trip_price['price_night'] = viewd_car[0].price_night / 1.0
         data_trip_price['booking_price'] = viewd_car[0].booking_price / 1.0
-
-        # raise Exception(data_trip_price['booking_price'])
 
         serializer = TripPriceSerializer(data=data_trip_price)
         if serializer.is_valid():
@@ -688,7 +655,7 @@ def trip_start(request,pk):
         # add log
         now = datetime.datetime.now()
         data_log = {'time_stamp': now.strftime("%H:%M"),
-                    'type': 'active',
+                    'type': 'start',
                     'trip': Trip.objects.latest('id').id
                     }
         serializer = TripLogSerializer(data=data_log)
@@ -717,13 +684,75 @@ def trip_start(request,pk):
     else:
         return Response(TripSerializer(Trip.objects.latest('id').id).data, status=status.HTTP_200_OK)
 
-# +++++++++++++++++++++++++++++++++++++++++++++++ logs ++++++++++++++++++++++++++++++++++++=
-# class TripLogList(CreateAPIView):
-#     queryset = TripLog.objects.all()
-#     serializer_class = TripLogSerializer
-#     permission_classes = [IsAuthenticated]
 
-def is_admin(self, request):
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def trip_finish(request):
+    latitude = float(request.query_params.get('latitude'))
+    longitude = float(request.query_params.get('longitude'))
+
+    user = request.user
+    user_profile = Profile.objects.get(user=user)
+
+    if len(Trip.objects.filter(user=user_profile, is_active=True)) == 0:
+        return Response({"error": "no active trips"}, status=status.HTTP_400_BAD_REQUEST)
+    trip = Trip.objects.filter(user=user_profile, is_active=True)[0]
+    car_work = Cars.objects.get(pk=trip.car.id)
+
+    #     adding for booking
+    if trip.is_booked:
+        date = datetime.date(1, 1, 1)
+        log_start = TripLog.objects.filter(trip=trip.id, type='start')[0].time_stamp
+        log_booked = TripLog.objects.filter(trip=trip.id, type='booked')[0].time_stamp
+        datetime1 = datetime.datetime.combine(date, log_start)
+
+        datetime2 = datetime.datetime.combine(date, log_booked)
+
+        time_book_total = datetime1 - datetime2
+        booking_add = 0
+        if time_book_total.total_seconds() / 60 > car_work.car_class.booking_time:
+            booking_add = car_work.car_class.price.booking_price * time_book_total.total_seconds() / 60
+
+    # day or night
+    day_flag = False
+    if datetime.datetime.today().strftime("%p") == "AM":
+        day_flag = True
+    #         calculate distanse of trip
+    disctance_trip = haversin(car_work.latitude, car_work.longitude, latitude, longitude)
+
+    # day or night
+    price_distance = car_work.car_class.price.price_for_km * disctance_trip
+
+    if datetime.datetime.today().strftime("%p") != "AM":
+        price_distance += car_work.car_class.price.night_add
+
+    #         final price and status
+
+    Trip.objects.filter(user=user_profile, is_active=True).update(final_price=price_distance + booking_add)
+    Trip.objects.filter(user=user_profile, is_active=True).update(is_active=False)
+
+    # create log
+    now = datetime.datetime.now()
+
+    data_log = {'time_stamp': now.strftime("%H:%M"),
+                'type': 'finished',
+                'trip': trip.id
+                }
+    serializer = TripLogSerializer(data=data_log)
+    if serializer.is_valid():
+        serializer.save()
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # car status
+    Cars.objects.filter(pk=trip.car.id).update(status="free")
+    return Response(TripSerializer(trip).data, status=status.HTTP_201_CREATED)
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++ logs ++++++++++++++++++++++++++++++++++++=
+
+
+def is_admin(request):
     pk_user = request.user.id
     user_profile = Profile.objects.get(pk=pk_user)
     if not user_profile.is_admin:
@@ -731,33 +760,41 @@ def is_admin(self, request):
     else:
         return True
 
-@api_view(['POST'])
-def post_logs(self, request,pk,**kwargs):
 
-    if not self.is_admin(request=request):
-        return Response({"error": "no rights"}, status=status.HTTP_401_UNAUTHORIZED)
-    # # raise Exception(request.data)
-    request.data['trip'] = pk
-    serializer = TripLogSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data,
-                        status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['POST', 'GET'])
+@permission_classes([IsAuthenticated])
+def post_get_logs(request, pk):
+    if request.method == 'POST':
+        if not is_admin(request=request):
+            return Response({"error": "no rights"}, status=status.HTTP_401_UNAUTHORIZED)
+        tmp_data = dict(request.data)
+        now = datetime.datetime.now()
 
-@api_view(['GET'])
-def get_logs(self, request, pk):
-    logs = TripLog.objects.filter(trip = pk)
-    serializer = TripLogSerializer(logs, many=True)
-    # raise Exception(serializer.data)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+        tmp_data['trip'] = pk
+        tmp_data['time_stamp'] = now.strftime("%H:%M")
+        if type(tmp_data['type']) == list:
+            tmp_data['type'] = tmp_data['type'][0]
+
+        serializer = TripLogSerializer(data=tmp_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,
+                            status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        logs = TripLog.objects.filter(trip=pk)
+        serializer = TripLogSerializer(logs, many=True)
+        # raise Exception(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class TripLogListDetail(APIView):
-    queryset = Cars.objects.all()
-    serializer_class = CarSerializer
+    queryset = TripLog.objects.all()
+    serializer_class = TripLogSerializer
     permission_classes = [IsAuthenticated]
 
+    # raise Exception("hi")
     def is_admin(self, request):
         pk_user = request.user.id
         user_profile = Profile.objects.get(pk=pk_user)
@@ -768,30 +805,24 @@ class TripLogListDetail(APIView):
 
     def get_object(self, pk, pk_log):
         try:
-            return Cars.objects.get(pk=pk)
-        except Cars.DoesNotExist:
-            return Response({"error": "there is no such price"}, status=status.HTTP_400_BAD_REQUEST)
+            return TripLog.objects.filter(trip=pk, pk=pk_log)[0]
+        except TripLog.DoesNotExist:
+            return Response({"error": "there is no such log"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, pk,pk_log):
-        car = self.get_object(pk)
-        serializer = CarSerializer(car)
+    def get(self, request, pk, pk_log):
+
+        log = self.get_object(pk, pk_log)
+        serializer = TripLogSerializer(log)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request, pk, pk_log):
         if not self.is_admin(request=request):
             return Response({"error": "no rights"}, status=status.HTTP_401_UNAUTHORIZED)
-        car = self.get_object(pk)
-        serializer = CarSerializer(car,
-                                   data=request.data,
-                                   partial=True)
+        log = self.get_object(pk, pk_log)
+        serializer = TripLogSerializer(log,
+                                       data=request.data,
+                                       partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, pk_log):
-        if not self.is_admin(request=request):
-            return Response({"error": "no rights"}, status=status.HTTP_401_UNAUTHORIZED)
-        car = self.get_object(pk)
-        car.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
