@@ -431,14 +431,25 @@ class Car_book_test(APITestCase):
         self.api_authentication()
         Profile.objects.all().update(is_admin=True)
 
-        response = self.client.get('/cars/free/?latitude=55&longitude=37&distance=100&class_car=economy&ordering=distance')
-
+        self.client.get('/cars/free/?latitude=55&longitude=37&distance=100&class_car=economy&ordering=distance')
         id_car = ViewedCars.objects.all()[0].id
+        # raise Exception(ViewedCars.objects.all(),id_car)
+
         response1 = self.client.post('/cars/{}/book'.format(id_car))
 
         self.assertEqual(response1.status_code, 200)
         self.assertEqual(Cars.objects.get(pk=id_car).status, "booked")
+        self.assertGreaterEqual(Cars.objects.get(pk = id_car).level_consumption, 0)
         self.assertNotEqual(len(TripPrice.objects.all()), 0)
         self.assertNotEqual(len(TripLog.objects.all()), 0)
         self.assertEqual(len(ViewedCars.objects.all()), 0)
+
+    def test_cars_not_enough_quiryparams(self):
+        self.api_authentication()
+        Profile.objects.all().update(is_admin=True)
+
+        response1 = self.client.get('/cars/free/?latitude=55')
+
+        self.assertEqual(response1.status_code, 400)
+
 

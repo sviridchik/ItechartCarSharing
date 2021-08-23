@@ -109,11 +109,15 @@ def haversin(lat1, lon1, lat2, lon2):
 
 @api_view(['GET'])
 def get_free_cars(request):
+    if request.query_params.get('latitude') is None or request.query_params.get('longitude') is None or request.query_params.get('distance') is None or request.query_params.get('class_car') is None or request.query_params.get('ordering') is None:
+        return Response({"error": "not enough query params"}, status=status.HTTP_400_BAD_REQUEST)
     latitude = float(request.query_params.get('latitude'))
     longitude = float(request.query_params.get('longitude'))
     distance = float(request.query_params.get('distance'))
     class_car = request.query_params.get('class_car')
     ordering = request.query_params.get('ordering')
+
+
     disc_flag = False
     user = request.user
 
@@ -129,6 +133,8 @@ def get_free_cars(request):
         car_lat = free_car.latitude
         car_lon = free_car.longitude
         s = haversin(latitude, longitude, car_lat, car_lon)
+        if free_car.level_consumption <= 0:
+            continue
         if s <= distance and free_car.car_class.name == class_car:
             data_viewed = {}
             res.append({"car": dict(CarSerializer(free_car).data), "distance": s})
@@ -197,6 +203,8 @@ def to_book(request, pk):
         car = Cars.objects.get(pk=pk)
         if car.status != "free":
             return Response({"error": "this car is not free"}, status=status.HTTP_400_BAD_REQUEST)
+        if car.level_consumption <= 0:
+            return Response({"error": "not enough fuel, sorry"}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
     Cars.objects.filter(pk=pk).update(status="booked")

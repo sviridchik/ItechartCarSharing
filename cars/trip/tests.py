@@ -275,7 +275,29 @@ class Trip_finish_test(APITestCase):
         self.assertEqual(Cars.objects.get(pk=id_car).status, "free")
         self.assertEqual(TripLog.objects.latest('id').type, "finished")
 
+    def test_trip_finish_not_enough_quiryparams(self):
+        self.api_authentication()
+        Profile.objects.all().update(is_admin=True)
 
+        self.client.get('/cars/free/?latitude=55&longitude=37&distance=100&class_car=economy&ordering=distance')
+
+        id_car = ViewedCars.objects.all()[0].id
+        self.client.post('/cars/{}/book'.format(id_car))
+        self.client.post('/trip/start/{}'.format(id_car))
+
+        id_trip = Trip.objects.filter(is_active=True)[0].id
+        now = datetime.datetime.now()
+
+        data_log = {'time_stamp': now.strftime("%H:%M"),
+                    'type': 'start'
+                    }
+
+        self.client.post('/trip/{}/logs'.format(id_trip), data=data_log)
+        self.client.get('/trip/{}/logs'.format(id_trip))
+
+        response = self.client.post('/trip/finish/?latitude=53'.format(id_trip))
+
+        self.assertEqual(response.status_code, 400)
 
 
 class Trip_get_test_me(APITestCase):

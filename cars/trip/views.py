@@ -81,6 +81,7 @@ class TripPriceListDetail(APIView):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def trip_start(request, pk):
+    # level of consumption is ok here
     user = request.user
     user_profile = Profile.objects.get(user=user)
     flag_book = False
@@ -168,8 +169,12 @@ def trip_start(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def trip_finish(request):
+    if request.query_params.get('latitude') is None or request.query_params.get('longitude') is None:
+        return Response({"error": "not enough query params"}, status=status.HTTP_400_BAD_REQUEST)
+
     latitude = float(request.query_params.get('latitude'))
     longitude = float(request.query_params.get('longitude'))
+
 
     user = request.user
     user_profile = Profile.objects.get(user=user)
