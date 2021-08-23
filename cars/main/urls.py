@@ -17,7 +17,6 @@ urlpatterns = [
     path('users/logout',views.LogoutApiView.as_view()),
     path('users/',views.users_get),
     re_path('users/(?P<pk>\d)|(?P<me>me)', views.users_get_pk),
-
     path('price', views.PriceList.as_view()),
     path('price/', views.PriceList.as_view()),
     path('price/<int:pk>', views.PriceListDetail.as_view()),

@@ -1,6 +1,7 @@
 from rest_framework.test import APITestCase
 from .models import *
 from django.test import Client
+
 req_test_health = {}
 
 
@@ -56,10 +57,8 @@ class User_get_test(APITestCase):
                                      data={'username': 'test123', 'password': 'test123123', "dtp_times": 9,
                                            "email": "test@gmail.com", "date_of_birth": "2003-09-09"})
 
-        # raise Exception(Profile.objects.all()[0].is_admin)
         response = self.client.post('/users/signin', data={'username': 'test123', 'password': 'test123123'})
         self.token = response.data['access']
-        # self.api_authentication()
 
     def api_authentication(self):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
@@ -72,13 +71,10 @@ class User_get_test(APITestCase):
 
     def test_users_not_admin(self):
         self.api_authentication()
-        # Profile.objects.all().update(is_admin=True)
         response = self.client.get('/users/')
         self.assertEqual(response.status_code, 401)
 
     def test_users_not_auth(self):
-        # self.api_authentication()
-        # Profile.objects.all().update(is_admin=True)
         response = self.client.get('/users/')
         self.assertEqual(response.status_code, 401)
 
@@ -299,10 +295,8 @@ class User_delete_test_pk(APITestCase):
         self.assertEqual(response.status_code, 401)
 
 
-
-#++++++++++++++++++++++ price +++++++++++++++++++++++++++++++++++++++++++++++
+# ++++++++++++++++++++++ price +++++++++++++++++++++++++++++++++++++++++++++++
 class Price_post_test(APITestCase):
-
 
     def setUp(self):
         self.user = self.client.post('/users/signup',
@@ -317,8 +311,6 @@ class Price_post_test(APITestCase):
     def api_authentication(self):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
 
-
-
     def test_price(self):
         payload = {
             "price_for_km": 23,
@@ -329,10 +321,9 @@ class Price_post_test(APITestCase):
             "description": "very informative"
         }
 
-
         self.api_authentication()
         Profile.objects.all().update(is_admin=True)
-        response = self.client.post('/price/',data=payload)
+        response = self.client.post('/price/', data=payload)
         # raise Exception(Price.objects.all()[0].description)
         self.assertEqual(response.status_code, 201)
 
@@ -364,6 +355,7 @@ class Price_post_test(APITestCase):
                                     })
         self.assertEqual(response.status_code, 401)
 
+
 #
 class Price_get_test(APITestCase):
 
@@ -376,15 +368,10 @@ class Price_get_test(APITestCase):
         response = self.client.post('/users/signin', data={'username': 'test123', 'password': 'test123123'})
         self.token = response.data['access']
 
-
         # self.api_authentication()
-
-
 
     def api_authentication(self):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
-
-
 
     def test_price(self):
         self.api_authentication()
@@ -477,11 +464,9 @@ class Price_get_test_pk(APITestCase):
         response = self.client.get('/price/{}'.format(id))
         self.assertEqual(response.status_code, 200)
 
-
     def test_users_not_auth(self):
         response = self.client.get('/price/{}'.format(1))
         self.assertEqual(response.status_code, 401)
-
 
 
 class Price_patch_test_pk(APITestCase):
@@ -511,7 +496,7 @@ class Price_patch_test_pk(APITestCase):
                              "description": "very informative"
                          })
         id = Price.objects.all()[0].id
-        response = self.client.patch('/price/{}'.format(id),data = {"price_dtp": 3,})
+        response = self.client.patch('/price/{}'.format(id), data={"price_dtp": 3, })
         self.assertEqual(Price.objects.get(pk=id).price_dtp, 3)
         self.assertEqual(response.status_code, 200)
 
@@ -535,9 +520,8 @@ class Price_patch_test_pk(APITestCase):
 
 
 def test_users_not_auth(self):
-        response = self.client.patch('/price/{}'.format(id), data={ })
-        self.assertEqual(response.status_code, 401)
-
+    response = self.client.patch('/price/{}'.format(id), data={})
+    self.assertEqual(response.status_code, 401)
 
 
 class Price_delete_test_pk(APITestCase):
@@ -586,7 +570,6 @@ class Price_delete_test_pk(APITestCase):
         id = Price.objects.all()[0].id
         response = self.client.delete('/price/{}'.format(id))
         self.assertEqual(response.status_code, 401)
-
 
     def test_users_not_auth(self):
         response = self.client.delete('/price/{}'.format(1))

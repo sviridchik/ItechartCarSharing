@@ -31,12 +31,10 @@ class Price(models.Model):
     description = models.TextField()
 
 
-
-
-class Class_car(models.Model):
+class ClassCar(models.Model):
     id = models.IntegerField(primary_key=True, auto_created=True, verbose_name='id')
     name = models.CharField(max_length=255)
-    price = models.ForeignKey(Price,on_delete=models.SET_NULL,null = True)
+    price = models.ForeignKey(Price, on_delete=models.SET_NULL, null=True)
     booking_time = models.IntegerField(blank=False)
 
 
@@ -49,12 +47,10 @@ class Cars(models.Model):
     year = models.IntegerField(blank=False)
     latitude = models.FloatField(blank=True)
     status = models.CharField(max_length=255, choices=status_choose)
-    car_class = models.ForeignKey(Class_car,on_delete=models.SET_NULL,null = True)
+    car_class = models.ForeignKey(ClassCar, on_delete=models.SET_NULL, null=True)
     longitude = models.FloatField(blank=True)
 
 
-
-# Create your models here.
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     id = models.IntegerField(primary_key=True, auto_created=True, verbose_name='id')
