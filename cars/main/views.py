@@ -95,6 +95,56 @@ class UserList(APIView):
         # raise Exception(serializer)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
+class UserDetailList(APIView):
+    permission_classes = (IsAuthenticated, MyPermissionPkME)
+    # raise Exception("hi")
+    def preparation(self,request, pk=None,me=None):
+        pk_user = request.user.id
+        is_admin_user = False
+        pk_target = None
+        if pk is not None:
+            pk_target = pk
+            if pk != pk_user:
+                is_admin_user = True
+        elif me is not None:
+            pk_target = pk_user
+        return pk_target
+
+    def get_object(self,class_data, pk, message):
+
+        try:
+            return class_data.objects.get(pk=pk)
+        except class_data.DoesNotExist:
+            return Response({"error": f"there is no such {message}"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def get(self, request, pk=None, me=None):
+        profiles = Profile.objects.all()
+        serializer = UserSerializer(profiles, many=True)
+        # raise Exception(serializer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, pk=None, me=None):
+
+        pk_target = self.preparation(request=request, pk=pk, me=me)
+        node = self.get_object(class_data=Profile, pk=pk_target, message='user')
+
+        node.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def patch(self, request, pk=None, me=None):
+        pk_target = self.preparation(request=request, pk=pk, me=me)
+
+        profile = self.get_object(class_data=Profile, pk=pk_target, message='user')
+        serializer = UserSerializer(profile,
+                                     data=request.data,
+                                     partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 @api_view(['PATCH', 'GET', 'DELETE'])
 @permission_classes([IsAuthenticated, MyPermissionPkME])
@@ -104,19 +154,14 @@ def users_get_pk(request, pk=None, me=None):
     pk_target = None
     if pk is not None:
         pk_target = pk
-        is_admin_user = True
+        if pk != pk_user:
+            is_admin_user = True
     elif me is not None:
         pk_target = pk_user
     if request.method == 'GET':
-        res = {}
-        try:
-            e = Profile.objects.get(pk=pk_target)
-            res[e.id] = {"name ": e.user.username, "email": e.email, "date_of_birth": e.date_of_birth,
-                         "dtp_times": e.dtp_times, "is_admin": e.is_admin}
-            # raise Exception(res)
-        except Exception as ex:
-            return Response({"error": ex}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(res, status=status.HTTP_200_OK)
+        profile = get_object(class_data=Profile, pk=pk_target, message='user')
+        serializer = UserSerializer(profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     elif request.method == 'PATCH':
         # if admin can change all fields
         allowed_val_admin = ["name", "email"]
@@ -127,38 +172,33 @@ def users_get_pk(request, pk=None, me=None):
             allowed_val = allowed_val_admin
         else:
             allowed_val = allowed_val_user
+        # if set(request.data.keys()).issubset(set(allowed_val)):
+            profile = get_object(class_data=Profile, pk=pk_target, message='user')
+            # Profile.objects.filter(pk)
+            serializer = UserSerializer(profile,data=request.data,partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                raise Exception("hi")
 
-        for field in request.data.keys():
-            val = request.data[field]
-            if field in allowed_val:
-                if field == "name":
-                    Profile.objects.filter(pk=pk_target).update(username=val)
-                elif field == "email":
-                    Profile.objects.filter(pk=pk_target).update(email=val)
-                elif field == "date_of_birth":
-                    Profile.objects.filter(pk=pk_target).update(date_of_birth=val)
-                elif field == "dtp_times":
-                    Profile.objects.filter(pk=pk_target).update(dtp_times=val)
-                elif field == "is_admin":
-                    Profile.objects.filter(pk=pk_target).update(is_admin=val)
-
+                return Response(serializer.data, status=status.HTTP_200_OK)
             else:
-                return Response({"error": "invalid field"}, status=status.HTTP_400_BAD_REQUEST)
-        res = {}
-        try:
-            node = Profile.objects.get(pk=pk_target)
-            res[node.id] = {"name ": node.user.username, "email": node.email, "date_of_birth": node.date_of_birth,
-                            "dtp_times": node.dtp_times, "is_admin": node.is_admin}
-        except Exception as ex:
-            return Response({"error": ex}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(res, status=status.HTTP_200_OK)
+
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # else:
+        #     raise Exception("hi")
+        #
+        #     return Response({"error": "invalid field"}, status=status.HTTP_400_BAD_REQUEST)
+        # res = {}
+        # try:
+        #     node = Profile.objects.get(pk=pk_target)
+        #     res[node.id] = {"name ": node.user.username, "email": node.email, "date_of_birth": node.date_of_birth,
+        #                     "dtp_times": node.dtp_times, "is_admin": node.is_admin}
+        # except Exception as ex:
+        #     return Response({"error": ex}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({}, status=status.HTTP_200_OK)
 
     elif request.method == 'DELETE':
-
-        res = {}
-        node = Profile.objects.get(pk=pk_target)
-        res[node.id] = {"name ": node.user.username, "email": node.email, "date_of_birth": node.date_of_birth,
-                        "dtp_times": node.dtp_times, "is_admin": node.is_admin}
-        Profile.objects.filter(pk=pk_target).delete()
-
-        return Response(res, status=status.HTTP_200_OK)
+        node = get_object(class_data= Profile,pk=pk_target,message='user')
+        node.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
