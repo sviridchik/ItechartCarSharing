@@ -55,7 +55,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
+APPEND_SLASH = True
 ROOT_URLCONF = 'cars.urls'
 
 TEMPLATES = [

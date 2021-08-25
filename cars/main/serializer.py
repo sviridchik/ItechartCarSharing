@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import *
+from .models import Profile
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -13,10 +13,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ['date_of_birth', 'email', 'dtp_times', 'username', 'password']
+        fields = ('date_of_birth', 'email', 'dtp_times', 'username', 'password')
 
     def save(self, **kwargs):
-        ps = make_password(self.data['password'])
         user = User.objects.create_user(self.data['username'], self.data['email'], self.data['password'])
         profile = Profile.objects.create(user=user, date_of_birth=self.data['date_of_birth'],
                                          email=self.data['email'],

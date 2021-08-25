@@ -1,24 +1,24 @@
+from django.contrib.auth.hashers import make_password
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework import viewsets, status
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
-from rest_framework.mixins import CreateModelMixin
-from rest_framework.generics import GenericAPIView, CreateAPIView
-from django.contrib.auth.hashers import make_password
-from .serializer import *
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.urls import reverse
+from rest_framework import viewsets, status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.generics import GenericAPIView, CreateAPIView
+from rest_framework.mixins import CreateModelMixin
+from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from .models import *
+from .permissions import MyPermissionAdmin, MyPermissionPkME
+from .serializer import *
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def change(request):
-    user = request.user
+def health(request):
     return Response({}, status=status.HTTP_200_OK)
 
 
@@ -36,9 +36,10 @@ class SignUp(CreateAPIView):
         serializer = UserSerializer(data=user)
         if serializer.is_valid(raise_exception=True):
             user_saved = serializer.save()
-        n = str(user_saved.user)
-        return Response(data={"name ": n, "email": user_saved.email, 'date_of_birth': user_saved.date_of_birth},
-                        status=status.HTTP_201_CREATED)
+        name_saved_user = str(user_saved.user)
+        return Response(
+            data={"name": name_saved_user, "email": user_saved.email, "date_of_birth": user_saved.date_of_birth},
+            status=status.HTTP_201_CREATED)
 
 
 class LogoutApiView(GenericAPIView):
@@ -53,54 +54,64 @@ class LogoutApiView(GenericAPIView):
         return Response(status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def users_get(request):
-    # auth_part
-    user = request.user
-    user_profile = Profile.objects.get(pk=user.id)
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated, MyPermissionAdmin])
+# def users_get(request):
+#     # auth_part
+#     user = request.user
+#     user_profile = Profile.objects.get(pk=user.id)
+#     res = {}
+#     try:
+#         dataProfile = Profile.objects.all()
+#         for e in dataProfile:
+#             res[e.id] = {"name ": e.user.username, "email": e.email, "date_of_birth": e.date_of_birth,
+#                          "dtp_times": e.dtp_times, "is_admin": e.is_admin}
+#     except Exception as e:
+#         return Response({}, status=status.HTTP_400_BAD_REQUEST)
+#     return Response(res, status=status.HTTP_200_OK)
 
-    if not user_profile.is_admin:
-        return Response({"error": "no rignts"}, status=status.HTTP_401_UNAUTHORIZED)
-    # end
-    res = {}
-    try:
-        dataProfile = Profile.objects.all()
-        for e in dataProfile:
-            res[e.id] = {"name ": e.user.username, "email": e.email, 'date_of_birth': e.date_of_birth,
-                         "dtp_times": e.dtp_times, "is_admin": e.is_admin}
-        # raise Exception(res)
-    except Exception as e:
-        return Response({}, status=status.HTTP_400_BAD_REQUEST)
-    return Response(res, status=status.HTTP_200_OK)
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated, MyPermissionAdmin])
+# def users_get(request):
+#     # auth_part
+#     user = request.user
+#     user_profile = Profile.objects.get(pk=user.id)
+#     res = {}
+#     try:
+#         dataProfile = Profile.objects.all()
+#         for e in dataProfile:
+#             res[e.id] = {"name ": e.user.username, "email": e.email, "date_of_birth": e.date_of_birth,
+#                          "dtp_times": e.dtp_times, "is_admin": e.is_admin}
+#     except Exception as e:
+#         return Response({}, status=status.HTTP_400_BAD_REQUEST)
+#     return Response(res, status=status.HTTP_200_OK)
+
+class UserList(APIView):
+    permission_classes = (IsAuthenticated, MyPermissionAdmin)
+
+    def get(self, request, format=None):
+        profiles = Profile.objects.all()
+        serializer = UserSerializer(profiles, many=True)
+        # raise Exception(serializer)
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
 
 @api_view(['PATCH', 'GET', 'DELETE'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, MyPermissionPkME])
 def users_get_pk(request, pk=None, me=None):
-    is_admin_user = False
-    # raise Exception(pk,me)
     pk_user = request.user.id
-    user_profile = Profile.objects.get(pk=pk_user)
+    is_admin_user = False
     pk_target = None
     if pk is not None:
-        pk = int(pk)
-        # not me ,then admin
-        if pk != pk_user:
-            if not user_profile.is_admin:
-                return Response({"error": "no rights"}, status=status.HTTP_401_UNAUTHORIZED)
-            else:
-                pk_target = pk
-                is_admin_user = True
-        else:
-            pk_target = pk
+        pk_target = pk
+        is_admin_user = True
     elif me is not None:
         pk_target = pk_user
     if request.method == 'GET':
         res = {}
         try:
             e = Profile.objects.get(pk=pk_target)
-            res[e.id] = {"name ": e.user.username, "email": e.email, 'date_of_birth': e.date_of_birth,
+            res[e.id] = {"name ": e.user.username, "email": e.email, "date_of_birth": e.date_of_birth,
                          "dtp_times": e.dtp_times, "is_admin": e.is_admin}
             # raise Exception(res)
         except Exception as ex:
@@ -136,7 +147,7 @@ def users_get_pk(request, pk=None, me=None):
         res = {}
         try:
             node = Profile.objects.get(pk=pk_target)
-            res[node.id] = {"name ": node.user.username, "email": node.email, 'date_of_birth': node.date_of_birth,
+            res[node.id] = {"name ": node.user.username, "email": node.email, "date_of_birth": node.date_of_birth,
                             "dtp_times": node.dtp_times, "is_admin": node.is_admin}
         except Exception as ex:
             return Response({"error": ex}, status=status.HTTP_400_BAD_REQUEST)
@@ -146,7 +157,7 @@ def users_get_pk(request, pk=None, me=None):
 
         res = {}
         node = Profile.objects.get(pk=pk_target)
-        res[node.id] = {"name ": node.user.username, "email": node.email, 'date_of_birth': node.date_of_birth,
+        res[node.id] = {"name ": node.user.username, "email": node.email, "date_of_birth": node.date_of_birth,
                         "dtp_times": node.dtp_times, "is_admin": node.is_admin}
         Profile.objects.filter(pk=pk_target).delete()
 
