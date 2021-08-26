@@ -21,9 +21,9 @@ from .serializer import *
 def health(request):
     return Response({}, status=status.HTTP_200_OK)
 
-
-def change_red(request):
-    return redirect("/health")
+#
+# def change_red(request):
+#     return redirect("/health")
 
 
 class SignUp(CreateAPIView):
