@@ -15,6 +15,7 @@ cars/cars/include
 data/
 develop-eggs/
 dist/
+.DS_Store
 downloads/
 eggs/
 .eggs/
