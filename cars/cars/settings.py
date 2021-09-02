@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 from datetime import timedelta
 from pathlib import Path
-
+import os
+import django
+import sys
+# django.setup()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -55,8 +58,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-ROOT_URLCONF = 'cars.urls'
+APPEND_SLASH = True
+ROOT_URLCONF = 'cars.cars.urls'
 
 TEMPLATES = [
     {
@@ -182,3 +185,12 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.Argon2PasswordHasher',
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
 ]
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# import sys
+if BASE_DIR not in sys.path:
+    sys.path.append(BASE_DIR)
+os.environ['DJANGO_SETTINGS_MODULE'] =  "cars.settings"
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cars.settings")
+# import django
+django.setup()
