@@ -1,5 +1,3 @@
-from django.shortcuts import redirect
-from django.shortcuts import redirect
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import GenericAPIView, CreateAPIView
@@ -15,10 +13,6 @@ from .serializer import *
 @api_view(['GET'])
 def health(request):
     return Response({}, status=status.HTTP_200_OK)
-
-
-def change_red(request):
-    return redirect("/health")
 
 
 class SignUp(CreateAPIView):
@@ -55,6 +49,7 @@ class UserList(APIView):
         profiles = Profile.objects.all()
         serializer = UserSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 class UserDetailList(APIView):

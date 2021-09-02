@@ -5,6 +5,8 @@ from .models import Profile
 
 class MyPermissionAdmin(BasePermission):
     def has_permission(self, request, view):
+        if request.method == 'POST':
+            return True
         user = request.user
         user_profile = Profile.objects.get(pk=user.id)
         if not user_profile.is_admin:
