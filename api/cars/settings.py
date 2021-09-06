@@ -59,7 +59,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 APPEND_SLASH = True
-ROOT_URLCONF = 'cars.cars.urls'
+ROOT_URLCONF = 'api.cars.urls'
 
 TEMPLATES = [
     {
@@ -76,7 +76,7 @@ TEMPLATES = [
         },
     },
 ]
-
+# 'api.wsgi.application'
 WSGI_APPLICATION = 'cars.wsgi.application'
 
 

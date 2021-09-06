@@ -1,0 +1,10 @@
+version: "3.3"
+
+services:
+  test_app:
+    build: .
+    command: bash -c "
+      sleep 5 &&
+      python api/manage.py test"
+    depends_on:
+      - main
