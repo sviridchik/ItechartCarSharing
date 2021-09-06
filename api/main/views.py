@@ -17,12 +17,12 @@ def health(request):
 
 class SignUp(CreateAPIView):
     queryset = Profile.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = ProfileSerializer
     permission_classes = [AllowAny]
 
     def post(self, request):
         user = request.data
-        serializer = UserSerializer(data=user)
+        serializer = ProfileSerializer(data=user)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
 
@@ -42,17 +42,17 @@ class LogoutApiView(GenericAPIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class UserList(APIView):
+class ProfileList(APIView):
     permission_classes = (IsAuthenticated, MyPermissionAdmin)
 
     def get(self, request, format=None):
         profiles = Profile.objects.all()
-        serializer = UserSerializer(profiles, many=True)
+        serializer = ProfileSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 
-class UserDetailList(APIView):
+class ProfileDetailList(APIView):
     permission_classes = (IsAuthenticated, MyPermissionPkME)
 
     def preparation(self, request, pk=None, me=None):
@@ -76,7 +76,7 @@ class UserDetailList(APIView):
 
     def get(self, request, pk=None, me=None):
         profiles = Profile.objects.all()
-        serializer = UserSerializer(profiles, many=True)
+        serializer = ProfileSerializer(profiles, many=True)
         # raise Exception(serializer)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -104,9 +104,9 @@ class UserDetailList(APIView):
             return Response({"error": "invalid field"}, status=status.HTTP_400_BAD_REQUEST)
 
         profile = self.get_object(class_data=Profile, pk=pk_target, message='user')
-        serializer = UserSerializer(profile,
-                                    data=request.data,
-                                    partial=True)
+        serializer = ProfileSerializer(profile,
+                                       data=request.data,
+                                       partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)

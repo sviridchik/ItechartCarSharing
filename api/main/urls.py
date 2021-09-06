@@ -12,7 +12,7 @@ urlpatterns = [
     path('users/signin', TokenObtainPairView.as_view(), name='signin'),
     path('users/signup', views.SignUp.as_view(), name='signup'),
     path('users/logout', views.LogoutApiView.as_view(), name='logout'),
-    path('users/&', views.UserList.as_view(), name='users'),
-    re_path('users/(?P<pk>\d)|(?P<me>me)', views.UserDetailList.as_view(), name='users_me'),
+    path('users/&', views.ProfileList.as_view(), name='users'),
+    re_path('users/(?P<pk>\d)|(?P<me>me)', views.ProfileDetailList.as_view(), name='users_me'),
 
 ]

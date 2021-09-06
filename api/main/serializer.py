@@ -7,7 +7,7 @@ from rest_framework_simplejwt import tokens
 from .models import Profile
 
 
-class UserSerializer(serializers.ModelSerializer):
+class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(max_length=150, source='user.username')
     password = serializers.CharField(max_length=128, source='user.password')
 
