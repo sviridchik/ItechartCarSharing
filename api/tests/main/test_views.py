@@ -4,6 +4,7 @@ from django.urls import reverse
 from main.models import Profile
 from rest_framework import status
 from rest_framework.test import APITestCase
+import uuid
 
 from .test_factories import ProfileFactory
 
@@ -121,7 +122,7 @@ class UserGetTestMe(APITestCase):
         response = self.client.get('/users/me')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-
+#
 #
 class UserGetTestPk(APITestCase):
 
@@ -131,6 +132,7 @@ class UserGetTestPk(APITestCase):
         response = self.client.post(reverse('signin'), data={'username': 'test123', 'password': 'test123123'})
         self.token = response.data['access']
         self.user_id = Profile.objects.all()[0].id
+        # raise Exception(self.user_id)
 
     def api_authentication(self):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
@@ -144,14 +146,20 @@ class UserGetTestPk(APITestCase):
 
     def test_users_not_admin_his_pk(self):
         self.api_authentication()
+
         response = self.client.get('/users/{}'.format(self.user_id))
+        # raise Exception(response)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_users_not_admin_and_not_his_pk(self):
         self.api_authentication()
-        response = self.client.get('/users/{}'.format(self.user_id + 1))
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # raise Exception(self.user_id[-1])
+        not_his_pk = uuid.uuid4()
+        # response = self.client.get('/users/{}'.format(str(int(self.user_id) + 1)))
+        response = self.client.get('/users/{}'.format(not_his_pk))
 
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+    #
     def test_users_not_auth(self):
         response = self.client.get('/users/me')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -218,7 +226,9 @@ class UserPatchTestPk(APITestCase):
 
     def test_users_not_admin_and_not_his_pk(self):
         self.api_authentication()
-        response = self.client.get('/users/{}'.format(self.user_id + 1), data={"email": "abracadabra@gmail.com"})
+        not_his_pk = uuid.uuid4()
+
+        response = self.client.get('/users/{}'.format(not_his_pk), data={"email": "abracadabra@gmail.com"})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_users_not_auth(self):
@@ -289,7 +299,9 @@ class UserDeleteTestPk(APITestCase):
 
     def test_users_not_admin_and_not_his_pk(self):
         self.api_authentication()
-        response = self.client.get('/users/{}'.format(self.user_id + 1))
+        not_his_pk = uuid.uuid4()
+
+        response = self.client.get('/users/{}'.format(not_his_pk))
         self.assertEqual(len(Profile.objects.all()), 1)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 

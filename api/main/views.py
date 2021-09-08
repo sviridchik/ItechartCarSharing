@@ -54,9 +54,13 @@ class ProfileList(APIView):
 
 class ProfileDetailList(APIView):
     permission_classes = (IsAuthenticated, MyPermissionPkME)
+    # permission_classes = (IsAuthenticated)
+
 
     def preparation(self, request, pk=None, me=None):
-        pk_user = request.user.id
+        profile = Profile.objects.get(user=request.user)
+        # pk_user = request.user.id
+        pk_user = profile.id
         self.is_admin_user = False
         pk_target = None
         if pk is not None:

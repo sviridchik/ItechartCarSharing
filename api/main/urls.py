@@ -13,6 +13,7 @@ urlpatterns = [
     path('users/signup', views.SignUp.as_view(), name='signup'),
     path('users/logout', views.LogoutApiView.as_view(), name='logout'),
     path('users/&', views.ProfileList.as_view(), name='users'),
-    re_path('users/(?P<pk>\d)|(?P<me>me)', views.ProfileDetailList.as_view(), name='users_me'),
+    # re_path('users/(?P<pk>\d)|(?P<me>me)', views.ProfileDetailList.as_view(), name='users_me'),
+    re_path('users/(?P<pk>[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})|(?P<me>me)', views.ProfileDetailList.as_view(), name='users_me'),
 
 ]

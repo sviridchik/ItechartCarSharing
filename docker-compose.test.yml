@@ -4,7 +4,12 @@ services:
   test_app:
     build: .
     command: bash -c "
-      sleep 5 &&
-      python api/manage.py test"
+      sleep 3 &&
+      cd api &&
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py collectstatic &&
+      python runtests.py"
     depends_on:
-      - main
+      - db
+

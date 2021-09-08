@@ -187,10 +187,3 @@ PASSWORD_HASHERS = [
 ]
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# import sys
-if BASE_DIR not in sys.path:
-    sys.path.append(BASE_DIR)
-os.environ['DJANGO_SETTINGS_MODULE'] =  "cars.settings"
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cars.settings")
-# import django
-django.setup()
