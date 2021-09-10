@@ -297,3 +297,53 @@ class UserDeleteTestPk(APITestCase):
         response = self.client.delete('/users/{}'.format(self.user_id))
         self.assertEqual(len(Profile.objects.all()), 1)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        
+        
+
+class UserGetTest(APITestCase):
+
+    def setUp(self):
+        profile = ProfileFactory()
+        self.user = profile.user
+        ps = profile.user.password
+        User.objects.filter(username=profile.user.username).update(password=make_password(ps))
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
+        payload = jwt_payload_handler(profile.user)
+        self.token = jwt_encode_handler(payload)
+        # response = self.client.post(reverse('signin'),
+        #                             data={'username': profile.user.username, 'password': profile.user.password})
+        # self.token = response.data['access']
+
+    def api_authentication(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
+
+    def test_users(self):
+        # self.api_authentication()
+        factory = APIRequestFactory()
+        view = ProfileList.as_view()
+        #
+        Profile.objects.all().update(is_admin=True)
+        request = factory.get(reverse('users'))
+        force_authenticate(request, user=self.user, token=self.token)
+        response = view(request)
+        # response = self.client.get(reverse('users'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_users_not_admin(self):
+        # self.api_authentication()
+        factory = APIRequestFactory()
+        view = ProfileList.as_view()
+        request = factory.get(reverse('users'))
+        force_authenticate(request, user=self.user, token=self.token)
+        response = view(request)
+
+        # response = self.client.get(reverse('users'))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_users_not_auth(self):
+        response = self.client.get(reverse('users'))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        
