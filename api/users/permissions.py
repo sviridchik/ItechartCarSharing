@@ -8,10 +8,7 @@ class MyPermissionAdmin(BasePermission):
         if request.method == 'POST':
             return True
         user = request.user
-        profile = Profile.objects.get(user=user)
-        user_profile = Profile.objects.get(pk=profile.id)
-        # raise Exception(user.id, profile.u_id)
-        # user_profile = Profile.objects.get(pk=user.uuid)
+        user_profile = Profile.objects.get(user=user)
 
         if not user_profile.is_admin:
             return False
@@ -20,26 +17,14 @@ class MyPermissionAdmin(BasePermission):
 
 
 class MyPermissionPkME(BasePermission):
-    def has_permission(self, request, view, pk=None, me=None):
-        user = request.user
-        user_profile = Profile.objects.get(user=user)
-        # pk_user = request.user.id
-        pk_user = user_profile.id
+    def has_permission(self, request, view):
+        user_profile = Profile.objects.get(user=request.user)
+
         pk = view.kwargs.get('pk')
         me = view.kwargs.get('me')
-        # raise Exception(pk)
-        # user_profile = Profile.objects.get(pk=pk_user)
 
-        if pk is not None:
-            # pk = int(pk)
-            # not me ,then admin
-
-            if pk != str(pk_user):
-                if not user_profile.is_admin:
-                    return False
-                else:
-                    return True
-            else:
-                return True
-        elif me is not None:
+        if me or str(user_profile.pk) == pk:
             return True
+        if user_profile.is_admin:
+            return True
+        return False
