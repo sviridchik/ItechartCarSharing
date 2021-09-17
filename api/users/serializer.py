@@ -1,6 +1,7 @@
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt import exceptions
 from rest_framework_simplejwt import tokens
 
@@ -49,8 +50,13 @@ class ProfileSerializerRedused(serializers.ModelSerializer):
         model = User
         fields = ('email', 'username')
 
-    # def validate(self, attrs):
-    #     raise Exception(attrs['user'].keys()[0] in ProfileSerializerRedused.fields)
+    def validate(self, attrs):
+        if not (list(self.initial_data.keys())[0] in list(
+                dict(ProfileSerializerRedused.__dict__['_declared_fields']).keys())):
+
+            raise serializers.ValidationError("there is no a such field")
+        else:
+            return attrs
 
     def update(self, instance, validated_data):
         instance.user.email = validated_data.get('email', instance.user.email)

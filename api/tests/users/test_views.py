@@ -2,7 +2,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.urls import reverse
 # from users.models import Profile
-from users.views import ProfileList,ProfileDetailList
+from users.views import ProfileList, ProfileDetailList
 from rest_framework import status
 from rest_framework.test import APITestCase
 import uuid
@@ -136,6 +136,8 @@ class UserGetTestMe(APITestCase):
     def test_users_not_auth(self):
         response = self.client.get('/users/me')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
 #
 
 # #
@@ -163,7 +165,6 @@ class UserGetTestPk(APITestCase):
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-
     def test_users_not_admin_his_pk(self):
         factory = APIRequestFactory()
         view = ProfileList.as_view()
@@ -186,7 +187,6 @@ class UserGetTestPkNotGood(APITestCase):
     def api_authentication(self):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
 
-
     def test_users_not_admin_his_pk(self):
         self.api_authentication()
         response = self.client.get('/users/{}'.format(self.user_id))
@@ -202,7 +202,6 @@ class UserGetTestPkNotGood(APITestCase):
     def test_users_not_auth(self):
         response = self.client.get('/users/me')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
 
 
 class UserPatchTestMe(APITestCase):
@@ -230,7 +229,6 @@ class UserPatchTestMe(APITestCase):
         response = self.client.patch('/users/me', data={"dtp_times": 10})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-
     def test_users_not_admin(self):
         self.api_authentication()
         response = self.client.patch('/users/me', data={"email": "abracadabra123@gmail.com"})
@@ -240,12 +238,12 @@ class UserPatchTestMe(APITestCase):
     def test_users_not_auth(self):
         response = self.client.patch('/users/me', data={"email": "abracadabra@gmail.com"})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-# problem
-#     def test_users_invalid_field(self):
-#         self.api_authentication()
-#         response = self.client.patch('/users/me', data={"parents": "abracadabra@gmail.com"})
-#         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-# #
+
+    def test_users_invalid_field(self):
+        self.api_authentication()
+        response = self.client.patch('/users/me', data={"parents": "abracadabra@gmail.com"})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 class UserPatchTestPk(APITestCase):
 
