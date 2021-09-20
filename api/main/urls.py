@@ -9,5 +9,4 @@ from main import views
 urlpatterns = [
     path('health/', views.health, name='health'),
     path('auth/', include('djoser.urls.jwt')),
-
 ]
