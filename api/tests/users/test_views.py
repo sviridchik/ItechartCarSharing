@@ -1,16 +1,17 @@
+import uuid
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APIRequestFactory
+from rest_framework.test import APITestCase
+from rest_framework.test import force_authenticate
+from rest_framework_jwt.settings import api_settings
+from users.models import Profile
 # from users.models import Profile
 from users.views import ProfileList, ProfileDetailList
-from rest_framework import status
-from rest_framework.test import APITestCase
-import uuid
-from users.models import Profile
+
 from .test_factories import ProfileFactory
-from rest_framework_jwt.settings import api_settings
-from rest_framework.test import APIRequestFactory
-from rest_framework.test import force_authenticate
 
 #
 req_test_health = {}
@@ -228,11 +229,6 @@ class UserPatchTestMe(APITestCase):
     def test_users_not_auth(self):
         response = self.client.patch('/users/me', data={"email": "abracadabra@gmail.com"})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    def test_users_invalid_field(self):
-        self.api_authentication()
-        response = self.client.patch('/users/me', data={"parents": "abracadabra@gmail.com"})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class UserPatchTestPk(APITestCase):

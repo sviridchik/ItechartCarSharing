@@ -21,14 +21,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         ps = make_password(validated_data.get('user')['password'])
         user, created = User.objects.get_or_create(
             username=validated_data.get('user')['username'],
-            defaults={'username': validated_data.get('user')['username'],
-                      'email': validated_data.get('user')['email'], 'password': ps})
+            defaults={'email': validated_data.get('user')['email'], 'password': ps})
 
-        profile, created = Profile.objects.get_or_create(user=user, date_of_birth=validated_data.get('date_of_birth'),
-                                                         dtp_times=validated_data.get('dtp_times'),
-                                                         defaults={'user': user,
-                                                                   'date_of_birth': validated_data.get('date_of_birth'),
-                                                                   # 'email': validated_data.get('email'),
+        profile, created = Profile.objects.get_or_create(user=user,
+                                                         defaults={'date_of_birth': validated_data.get('date_of_birth'),
                                                                    'dtp_times': validated_data.get('dtp_times')})
         return profile
 
@@ -50,14 +46,6 @@ class ProfileSerializerRedused(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email', 'username')
-
-    def validate(self, attrs):
-        if not (list(self.initial_data.keys())[0] in list(
-                dict(ProfileSerializerRedused.__dict__['_declared_fields']).keys())):
-
-            raise serializers.ValidationError("there is no a such field")
-        else:
-            return attrs
 
     def update(self, instance, validated_data):
         if 'user' in validated_data:
