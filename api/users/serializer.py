@@ -33,8 +33,9 @@ class ProfileSerializer(serializers.ModelSerializer):
         return profile
 
     def update(self, instance, validated_data):
-        instance.user.email = validated_data.get('email', instance.user.email)
-        instance.user.username = validated_data.get('username', instance.user.username)
+        if 'user' in validated_data:
+            instance.user.email = validated_data['user'].get('email', instance.user.email)
+            instance.user.username = validated_data['user'].get('username', instance.user.username)
         instance.user.password = validated_data.get('password', instance.user.password)
         instance.date_of_birth = validated_data.get('date_of_birth', instance.date_of_birth)
         instance.dtp_times = validated_data.get('dtp_times', instance.dtp_times)
@@ -59,8 +60,9 @@ class ProfileSerializerRedused(serializers.ModelSerializer):
             return attrs
 
     def update(self, instance, validated_data):
-        instance.user.email = validated_data.get('email', instance.user.email)
-        instance.user.username = validated_data.get('username', instance.user.username)
+        if 'user' in validated_data:
+            instance.user.email = validated_data['user'].get('email', instance.user.email)
+            instance.user.username = validated_data['user'].get('username', instance.user.username)
         return instance
 
 

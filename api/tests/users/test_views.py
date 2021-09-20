@@ -62,12 +62,9 @@ class UserGetTest(APITestCase):
         self.user = profile.user
         User.objects.filter(username=profile.user.username).update(password=make_password(ps))
 
-        # response = self.client.post(reverse('signin'),
-        #                             data={'username': profile.user.username, 'password': profile.user.password})
-        # self.token = response.data['access']
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-        #
+
         payload = jwt_payload_handler(profile.user)
         self.token = jwt_encode_handler(payload)
 
@@ -77,9 +74,7 @@ class UserGetTest(APITestCase):
     def test_users(self):
         factory = APIRequestFactory()
         view = ProfileList.as_view()
-        # self.api_authentication()
         Profile.objects.all().update(is_admin=True)
-        # response = self.client.get(reverse('users'))
         request = factory.get(reverse('users'))
         force_authenticate(request, user=self.user, token=self.token)
         response = view(request)
@@ -89,8 +84,7 @@ class UserGetTest(APITestCase):
     def test_users_not_admin(self):
         factory = APIRequestFactory()
         view = ProfileList.as_view()
-        # self.api_authentication()
-        # response = self.client.get(reverse('users'))
+
         request = factory.get(reverse('users'))
         force_authenticate(request, user=self.user, token=self.token)
         response = view(request)
@@ -138,9 +132,6 @@ class UserGetTestMe(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-#
-
-# #
 class UserGetTestPk(APITestCase):
 
     def setUp(self):
@@ -218,7 +209,6 @@ class UserPatchTestMe(APITestCase):
     def test_users(self):
         self.api_authentication()
         Profile.objects.all().update(is_admin=True)
-
         response = self.client.patch('/users/me', data={"email": "abracadabra12@gmail.com"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -307,7 +297,6 @@ class UserDeleteTestMe(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    # #
     def test_users_not_auth(self):
         response = self.client.delete('/users/me')
         self.assertEqual(len(Profile.objects.all()), 1)
