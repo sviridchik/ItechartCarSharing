@@ -20,11 +20,6 @@ class ProfileList(generics.ListCreateAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 
-    def list(self, request):
-        queryset = self.get_queryset()
-        serializer = ProfileSerializer(queryset, many=True)
-        return Response(serializer.data)
-
 
 class SignUp(CreateAPIView):
     queryset = Profile.objects.all()
@@ -52,22 +47,9 @@ class ProfileDetailList(RetrieveUpdateDestroyAPIView):
     def get_object(self):
         if 'me' in self.kwargs:
             pk = Profile.objects.get(user=self.request.user).pk
-        elif 'pk' in self.kwargs:
-            pk = self.kwargs['pk']
         else:
-            return Response({"error": "invaliud key attribute"}, status=status.HTTP_400_BAD_REQUEST)
+            pk = self.kwargs['pk']
         try:
             return Profile.objects.get(pk=pk)
         except Profile.DoesNotExist:
-            return Response({"error": f"there is no such user"}, status=status.HTTP_400_BAD_REQUEST)
-
-    def patch(self, request, *args, **kwargs):
-
-        node = self.get_object()
-        serializer = self.get_serializer_class(node)(node,
-                                                     data=request.data,
-                                                     partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Not found!"}, status=status.HTTP_400_BAD_REQUEST)

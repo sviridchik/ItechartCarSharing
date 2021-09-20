@@ -248,7 +248,7 @@ class UserPatchTestMe(APITestCase):
 class UserPatchTestPk(APITestCase):
 
     def setUp(self):
-        profile = ProfileFactory()
+        self.profile = ProfileFactory()
         response = self.client.post(reverse('signin'), data={'username': 'test123', 'password': 'test123123'})
         self.token = response.data['access']
         self.user_id = Profile.objects.all()[0].id
@@ -259,23 +259,24 @@ class UserPatchTestPk(APITestCase):
     def test_users(self):
         self.api_authentication()
         Profile.objects.all().update(is_admin=True)
-        response = self.client.get('/users/{}'.format(self.user_id), data={"email": "abracadabra@gmail.com"})
+        response = self.client.patch('/users/{}'.format(self.user_id), data={"email": "abracadabra@gmail.com"})
+        # raise Exception(Profile.objects.all()[0].user.email)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_users_not_admin_his_pk(self):
         self.api_authentication()
-        response = self.client.get('/users/{}'.format(self.user_id), data={"email": "abracadabra@gmail.com"})
+        response = self.client.patch('/users/{}'.format(self.user_id), data={"email": "abracadabra@gmail.com"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_users_not_admin_and_not_his_pk(self):
         self.api_authentication()
         not_his_pk = uuid.uuid4()
 
-        response = self.client.get('/users/{}'.format(not_his_pk), data={"email": "abracadabra@gmail.com"})
+        response = self.client.patch('/users/{}'.format(not_his_pk), data={"email": "abracadabra@gmail.com"})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_users_not_auth(self):
-        response = self.client.get('/users/{}'.format(self.user_id), data={"email": "abracadabra@gmail.com"})
+        response = self.client.patch('/users/{}'.format(self.user_id), data={"email": "abracadabra@gmail.com"})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
