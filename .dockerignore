@@ -24,3 +24,5 @@ src/node_modules
 web/static/CACHE
 stats
 Dockerfile
+~/data/**
+/data/
