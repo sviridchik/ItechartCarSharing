@@ -14,17 +14,3 @@ class MyPermissionAdminNotUser(BasePermission):
             return False
         else:
             return True
-
-
-class MyPermissionPkME(BasePermission):
-    def has_permission(self, request, view):
-        user_profile = Profile.objects.get(user=request.user)
-
-        pk = view.kwargs.get('pk')
-        me = view.kwargs.get('me')
-
-        if me or str(user_profile.pk) == pk:
-            return True
-        if user_profile.is_admin:
-            return True
-        return False
