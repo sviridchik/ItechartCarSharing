@@ -190,19 +190,6 @@ class UserPatchTestPk(PseudoAuth):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_users_not_admin_and_not_his_pk(self):
-        # это должно было работать ((((((((((((((
-
-        # ct = ContentType.objects.get_for_model(User)
-        #
-        # permission = Permission.objects.create(codename='MyPermissionAdmin',
-        #                                        name='MyPermissionAdmin',
-        #                                        content_type=ct)
-        # self.user.user_permissions.add(permission)
-        # permission = Permission.objects.create(codename='MyPermissionPkME',
-        #                                        name='MyPermissionPkME',
-        #                                        content_type=ct)
-        # self.user.user_permissions.add(permission)
-
         not_his_pk = uuid.uuid4()
         response = self.client.patch('/users/{}'.format(not_his_pk), data={"email": "abracadabra@gmail.com"})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
