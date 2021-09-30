@@ -21,6 +21,11 @@ class ProfileList(generics.ListCreateAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 
+    def post(self, request, *args, **kwargs):
+        birth_date = Profile.objects.get(user = request.user).date_of_birth
+        if (date.today() - birth_date) // timedelta(days=365.2425) <18:
+            return Response({"error": "under 18"},status.HTTP_400_BAD_REQUEST)
+        return self.create(request, *args, **kwargs)
 
 class SignUp(CreateAPIView):
     queryset = Profile.objects.all()

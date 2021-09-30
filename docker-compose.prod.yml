@@ -11,13 +11,12 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
   main:
-    build: .
+    build: ./api
     command: bash -c "
       sleep 5 &&
-      python api/manage.py makemigrations &&
-      python api/manage.py migrate &&
-      python api/manage.py collectstatic &&
-      cd api &&
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py collectstatic &&
       gunicorn cars.wsgi:application --bind 0.0.0.0:8000 --reload"
     ports:
       - "8000:8000"

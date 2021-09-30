@@ -2,13 +2,12 @@ version: "3.3"
 
 services:
   test_app:
-    build: .
+    build: ./api
     command: bash -c "
       sleep 3 &&
-      cd api &&
       python manage.py makemigrations &&
       python manage.py migrate &&
-      python manage.py collectstatic &&
+      python manage.py collectstatic --noinput &&
       python runtests.py"
     depends_on:
       - db
