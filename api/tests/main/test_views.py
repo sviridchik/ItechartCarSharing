@@ -1,5 +1,7 @@
+import uuid
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import User
 from django.urls import reverse
-# from .models import Profile
 from rest_framework import status
 from rest_framework.test import APITestCase
 

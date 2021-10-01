@@ -9,12 +9,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-# from .models import Profile
 from .permissions import MyPermissionAdmin, MyPermissionPkME
 from .serializer import *
 
+<< << << < HEAD
 
-# Create your views here.
 
 class ProfileList(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated, MyPermissionAdmin)
@@ -44,13 +43,14 @@ class ProfileDetailList(RetrieveUpdateDestroyAPIView):
         else:
             return ProfileSerializerRedused
 
-    # больше не моя специфичная штука)
-    def get_object(self):
-        if 'me' in self.kwargs:
-            pk = Profile.objects.get(user=self.request.user).pk
-        else:
-            pk = self.kwargs['pk']
-        try:
-            return Profile.objects.get(pk=pk)
-        except Profile.DoesNotExist:
-            return Response({"error": "Not found!"}, status=status.HTTP_404_NOT_FOUND)
+
+
+def get_object(self):
+    if 'me' in self.kwargs:
+        pk = Profile.objects.get(user=self.request.user).pk
+    else:
+        pk = self.kwargs['pk']
+    try:
+        return Profile.objects.get(pk=pk)
+    except Profile.DoesNotExist:
+        return Response({"error": "Not found!"}, status=status.HTTP_404_NOT_FOUND)

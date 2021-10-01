@@ -1,9 +1,12 @@
 from django.contrib.auth.hashers import make_password
+import uuid
 from django.contrib.auth.models import User, Permission
 from django.urls import reverse
 from price.models import Price
 from rest_framework import status
 from rest_framework.test import APITestCase
+from rest_framework.test import force_authenticate
+from rest_framework_jwt.settings import api_settings
 from users.models import Profile
 
 from .factories import ProfileFactory, PriceFactory
