@@ -1,0 +1,14 @@
+version: "3.3"
+
+services:
+  test_app:
+    build: ./api
+    command: bash -c "
+      sleep 3 &&
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py collectstatic &&
+      python runtests.py"
+    depends_on:
+      - db
+
