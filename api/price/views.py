@@ -16,7 +16,6 @@ from .serializer import *
 from price.permissions import MyPermissionAdminNotUser
 
 # Create your views here.
-#  ------------------- price --------------------
 class PriceList(generics.ListCreateAPIView):
     queryset = Price.objects.all()
     serializer_class = PriceSerializer

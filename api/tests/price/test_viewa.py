@@ -1,15 +1,9 @@
-import uuid
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.test.client import Client
 from django.urls import reverse
 from price.models import Price
 from rest_framework import status
-from rest_framework.test import APIRequestFactory
 from rest_framework.test import APITestCase
-from rest_framework.test import force_authenticate
-from rest_framework_jwt.settings import api_settings
 from users.models import Profile
 
 from .factories import ProfileFactory, PriceFactory
@@ -30,7 +24,6 @@ class PseudoAuth(APITestCase):
         PriceFactory()
 
 
-# ++++++++++++++++++++++ price +++++++++++++++++++++++++++++++++++++++++++++++
 class NotAuth(APITestCase):
     def setUp(self):
         ProfileFactory()

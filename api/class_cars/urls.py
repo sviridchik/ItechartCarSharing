@@ -8,7 +8,6 @@ from rest_framework_simplejwt.views import (
 from . import views
 
 urlpatterns = [
-# path('class', views.ClassList.as_view()),
 path('/', views.ClassList.as_view()),
 re_path('(?P<pk>[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})', views.ClassListDetail.as_view())
 ]
