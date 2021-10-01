@@ -1,6 +1,19 @@
 import factory
 from django.contrib.auth.models import User
+from price.models import Price
 from users.models import Profile
+
+
+class PriceFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Price
+
+    price_for_km = 23
+    night_add = 13
+    price_dtp = 8
+    parking_price = 9
+    booking_price = 23
+    description = "very informative"
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -18,4 +31,4 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
     user = factory.SubFactory(UserFactory)
     dtp_times = 9
-    date_of_birth = '2000-09-09'
+    date_of_birth = '2003-09-09'
