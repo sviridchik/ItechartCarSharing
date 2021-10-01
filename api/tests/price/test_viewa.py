@@ -30,7 +30,6 @@ class PseudoAuth(APITestCase):
         PriceFactory()
 
 
-# ++++++++++++++++++++++ price +++++++++++++++++++++++++++++++++++++++++++++++
 class NotAuth(APITestCase):
     def setUp(self):
         ProfileFactory()

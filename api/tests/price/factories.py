@@ -1,7 +1,8 @@
 import factory
 from django.contrib.auth.models import User
-from users.models import Profile
 from price.models import Price
+from users.models import Profile
+
 
 class PriceFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -10,9 +11,10 @@ class PriceFactory(factory.django.DjangoModelFactory):
     price_for_km = 23
     night_add = 13
     price_dtp = 8
-    parking_price =  9
+    parking_price = 9
     booking_price = 23
     description = "very informative"
+
 
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -26,7 +28,6 @@ class UserFactory(factory.django.DjangoModelFactory):
 class ProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Profile
-        # permissions = (('MyPermissionAdmin','MyPermissionPkME'))
 
     user = factory.SubFactory(UserFactory)
     dtp_times = 9

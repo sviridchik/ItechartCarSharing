@@ -10,10 +10,10 @@ from rest_framework.test import APITestCase
 from rest_framework.test import force_authenticate
 from rest_framework_jwt.settings import api_settings
 from users.models import Profile
-# from users.models import Profile
 from users.views import ProfileList, ProfileDetailList
 
 from .factories import ProfileFactory
+
 
 class MyAuthTest(APITestCase):
 
@@ -49,7 +49,6 @@ class LogoutTest2(APITestCase):
     def api_authentication(self):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
 
-    # 401 Unauthorized Error
     def test_health(self):
         response = self.client.get(reverse('health'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
