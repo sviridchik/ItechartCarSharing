@@ -15,7 +15,6 @@ import sys
 from datetime import timedelta
 from pathlib import Path
 
-# django.setup()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -42,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'main',
     'users',
+    'price',
     'djoser',
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
@@ -92,13 +92,6 @@ DATABASES = {
         'PORT': 5432,
     }
 }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -189,4 +182,4 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
 ]
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
