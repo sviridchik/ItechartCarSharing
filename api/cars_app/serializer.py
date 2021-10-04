@@ -4,7 +4,6 @@ from .models import *
 
 
 class CarSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Cars
@@ -14,7 +13,6 @@ class CarSerializer(serializers.ModelSerializer):
 
 
 class ViewedCarSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = ViewedCars

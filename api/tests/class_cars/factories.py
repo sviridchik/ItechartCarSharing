@@ -8,5 +8,5 @@ class ClassFactory(factory.django.DjangoModelFactory):
         model = ClassCar
 
     price = factory.SubFactory(PriceFactory)
-    name = "comfort",
+    name = "comfort"
     booking_time = 15

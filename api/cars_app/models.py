@@ -1,7 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.models import User
-from class_car.models import Class_car
+from users.models import Profile
+from class_cars.models import ClassCar
+from main.models import BaseModel
+
 mark_choose = (
     ("Mercedes-Benz", "Mercedes-Benz"),
     ("Toyota", "Toyota"),
@@ -33,11 +34,10 @@ car_choose = (
     ("booked", "booked"),
 )
 
-# Create your models here.
-from main.models import Profile
 
-class Cars(models.Model):
-    id = models.IntegerField(primary_key=True, auto_created=True, verbose_name='id')
+# Create your models here.
+
+class Cars(BaseModel):
     level_consumption = models.IntegerField()
     mark = models.CharField(max_length=255, choices=mark_choose)
     reg_number = models.CharField(max_length=255)
@@ -45,7 +45,7 @@ class Cars(models.Model):
     year = models.IntegerField(blank=False)
     latitude = models.FloatField(blank=True)
     status = models.CharField(max_length=255, choices=car_choose)
-    car_class = models.ForeignKey(Class_car, on_delete=models.SET_NULL, null=True)
+    car_class = models.ForeignKey(ClassCar, on_delete=models.SET_NULL, null=True)
     longitude = models.FloatField(blank=True)
 
 

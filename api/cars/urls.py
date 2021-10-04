@@ -22,6 +22,7 @@ urlpatterns = [
     path(r'users', include('users.urls')),
     path(r'price', include('price.urls')),
     path(r'class', include('class_cars.urls')),
+    path(r'cars', include('cars_app.urls')),
     path(r'', include('main.urls')),
 
 ]

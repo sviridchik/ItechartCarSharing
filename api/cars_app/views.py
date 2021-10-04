@@ -1,27 +1,24 @@
 # Create your views here.
 from math import cos, asin, sqrt, pi
 
-from main.models import Profile
 from price.models import *
 from price.permissions import MyPermissionAdminNotUser
 from price.serializer import *
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from users.models import Profile
 
 from .serializer import *
 
-
-# Create your views here.
 
 class CarList(generics.ListCreateAPIView):
     queryset = Cars.objects.all()
     serializer_class = CarSerializer
     permission_classes = (IsAuthenticated, MyPermissionAdminNotUser)
+
 
 class CarListDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Cars.objects.all()
@@ -41,7 +38,7 @@ def get_free_cars(request):
     latitude = float(request.query_params.get('latitude'))
     longitude = float(request.query_params.get('longitude'))
     distance = float(request.query_params.get('distance'))
-    class_car = request.query_params.get('class_car')
+    class_car = request.query_params.get('class')
     ordering = request.query_params.get('ordering')
     disc_flag = False
     user = request.user
@@ -78,37 +75,14 @@ def get_free_cars(request):
     return Response(res, status=status.HTTP_200_OK)
 
 
-#
 # -------- Viewed cars -----------
-class ViewedCarList(CreateAPIView):
+class ViewedCarList(generics.ListAPIView):
     queryset = ViewedCars.objects.all()
     serializer_class = ViewedCarSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, format=None):
-        car = ViewedCars.objects.all()
-        serializer = ViewedCarSerializer(car, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    permission_classes = (IsAuthenticated)
 
 
-class ViewedCarListDetail(APIView):
+class ViewedCarListDetail(generics.DestroyAPIView):
     queryset = ViewedCars.objects.all()
     serializer_class = ViewedCarSerializer
-
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self, pk):
-
-        try:
-            return ViewedCars.objects.get(pk=pk)
-        except ViewedCars.DoesNotExist:
-            return Response({"error": "there is no such price"}, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        if not self.is_admin(request=request):
-            return Response({"error": "no rights"}, status=status.HTTP_401_UNAUTHORIZED)
-        car = self.get_object(pk)
-        cars = ViewedCars.objects.all()
-        for car in cars:
-            car.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    permission_classes = (IsAuthenticated)
