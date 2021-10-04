@@ -10,13 +10,9 @@ from rest_framework.test import APITestCase
 from rest_framework.test import force_authenticate
 from rest_framework_jwt.settings import api_settings
 from users.models import Profile
-# from users.models import Profile
 from users.views import ProfileList, ProfileDetailList
 
 from .factories import ProfileFactory
-
-#
-req_test_health = {}
 
 
 class MyAuthTest(APITestCase):
@@ -53,7 +49,6 @@ class LogoutTest2(APITestCase):
     def api_authentication(self):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
 
-    # 401 Unauthorized Error
     def test_health(self):
         response = self.client.get(reverse('health'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -87,7 +82,7 @@ class UserGetTest(PseudoAuth):
 
 class NotAuthTest(APITestCase):
     def setUp(self):
-        profile = ProfileFactory()
+        ProfileFactory()
 
     def test_users_not_auth_get(self):
         response = self.client.get(reverse('users'))
@@ -137,7 +132,6 @@ class UserGetTestPk(PseudoAuth):
 
     def test_users(self):
         self.user_id = Profile.objects.all()[0].id
-
         Profile.objects.all().update(is_admin=True)
         response = self.client.get('/users/{}'.format(self.user_id))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -195,19 +189,6 @@ class UserPatchTestPk(PseudoAuth):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_users_not_admin_and_not_his_pk(self):
-        # это должно было работать ((((((((((((((
-
-        # ct = ContentType.objects.get_for_model(User)
-        #
-        # permission = Permission.objects.create(codename='MyPermissionAdmin',
-        #                                        name='MyPermissionAdmin',
-        #                                        content_type=ct)
-        # self.user.user_permissions.add(permission)
-        # permission = Permission.objects.create(codename='MyPermissionPkME',
-        #                                        name='MyPermissionPkME',
-        #                                        content_type=ct)
-        # self.user.user_permissions.add(permission)
-
         not_his_pk = uuid.uuid4()
         response = self.client.patch('/users/{}'.format(not_his_pk), data={"email": "abracadabra@gmail.com"})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
