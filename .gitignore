@@ -6,12 +6,13 @@ __pycache__/
 # C extensions
 *.so
 py
-cars/cars/bin
+api/cars/bin
 # Distribution / packaging
+.DS_Store
 .Python
 build/
 include/
-cars/cars/include
+api/cars/include
 data/
 develop-eggs/
 dist/

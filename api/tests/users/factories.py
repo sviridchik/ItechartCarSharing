@@ -15,7 +15,6 @@ class UserFactory(factory.django.DjangoModelFactory):
 class ProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Profile
-        # permissions = (('MyPermissionAdmin','MyPermissionPkME'))
 
     user = factory.SubFactory(UserFactory)
     dtp_times = 9
