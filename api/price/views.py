@@ -12,7 +12,8 @@ from rest_framework.views import APIView
 
 from users.models import Profile
 from users.permissions import MyPermissionAdmin, MyPermissionPkME
-from .serializer import *
+from .serializer import PriceSerializer
+from .models import Price
 from price.permissions import MyPermissionAdminNotUser
 
 # Create your views here.

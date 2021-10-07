@@ -49,8 +49,8 @@ class Cars(BaseModel):
     longitude = models.FloatField(blank=True)
 
 
-class ViewedCars(models.Model):
-    id = models.IntegerField(primary_key=True, auto_created=True, verbose_name='id')
+class ViewedCars(BaseModel):
+    # id = models.IntegerField(primary_key=True, auto_created=True, verbose_name='id')
     car = models.ForeignKey(Cars, on_delete=models.SET_NULL, null=True)
     price_day = models.IntegerField(blank=False)
     price_night = models.IntegerField(blank=False)

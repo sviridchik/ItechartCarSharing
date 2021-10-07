@@ -3,8 +3,8 @@ from price.permissions import MyPermissionAdminNotUser
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
-from .models import *
-from .serializers import *
+from .models import ClassCar
+from .serializers import ClassSerializer
 
 
 # Create your views here.

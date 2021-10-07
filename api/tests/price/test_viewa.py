@@ -32,7 +32,7 @@ class NotAuth(APITestCase):
         ProfileFactory()
 
     def test_price_not_auth(self):
-        response = self.client.post(reverse('prices'),
+        response = self.client.post(reverse('price:list'),
                                     data={
                                         "price_for_km": 23,
                                         "night_add": 13,
@@ -45,7 +45,7 @@ class NotAuth(APITestCase):
 
     def test_price_not_auth_get(self):
         PriceFactory()
-        response = self.client.get(reverse('prices'))
+        response = self.client.get(reverse('price:list'))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_users_not_auth_get_pk(self):
@@ -76,12 +76,12 @@ class PricePostTest(PseudoAuth):
 
     def test_price(self):
         Profile.objects.all().update(is_admin=True)
-        response = self.client.post(reverse('prices'), data=PricePostTest.payload)
+        response = self.client.post(reverse('price:list'), data=PricePostTest.payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     # looks like worked permissions
     def test_price_not_admin(self):
-        response = self.client.post(reverse('prices'),
+        response = self.client.post(reverse('price:list'),
                                     data=PricePostTest.payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -91,14 +91,14 @@ class PriceGetTest(PseudoAuth):
     def test_price(self):
         Profile.objects.all().update(is_admin=True)
 
-        response = self.client.get(reverse('prices'))
+        response = self.client.get(reverse('price:list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_price_not_admin(self):
         Profile.objects.all().update(is_admin=True)
 
         Profile.objects.all().update(is_admin=False)
-        response = self.client.get(reverse('prices'))
+        response = self.client.get(reverse('price:list'))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
@@ -107,14 +107,14 @@ class PriceGetTestPk(PseudoAuth):
     def test_price(self):
         Profile.objects.all().update(is_admin=True)
         id = Price.objects.all()[0].id
-        response = self.client.get(reverse('price_pk', kwargs={'pk': id}))
+        response = self.client.get(reverse('price:pk', kwargs={'pk': id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_users_not_admin(self):
         Profile.objects.all().update(is_admin=True)
         Profile.objects.all().update(is_admin=False)
         id = Price.objects.all()[0].id
-        response = self.client.get(reverse('price_pk', kwargs={'pk': id}))
+        response = self.client.get(reverse('price:pk', kwargs={'pk': id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
@@ -123,14 +123,14 @@ class PricePatchTestPk(PseudoAuth):
     def test_price(self):
         Profile.objects.all().update(is_admin=True)
         id = Price.objects.all()[0].id
-        response = self.client.patch(reverse('price_pk', kwargs={'pk': id}), data={"price_dtp": 3, })
+        response = self.client.patch(reverse('price:pk', kwargs={'pk': id}), data={"price_dtp": 3, })
         self.assertEqual(Price.objects.get(pk=id).price_dtp, 3)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_users_not_admin(self):
         Profile.objects.all().update(is_admin=False)
         id = Price.objects.all()[0].id
-        response = self.client.patch(reverse('price_pk', kwargs={'pk': id}), data={"price_dtp": 3, })
+        response = self.client.patch(reverse('price:pk', kwargs={'pk': id}), data={"price_dtp": 3, })
         self.assertEqual(Price.objects.get(pk=id).price_dtp, 8)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -140,11 +140,11 @@ class PriceDeleteTestPk(PseudoAuth):
     def test_price(self):
         Profile.objects.all().update(is_admin=True)
         id = Price.objects.all()[0].id
-        response = self.client.delete(reverse('price_pk', kwargs={'pk': id}))
+        response = self.client.delete(reverse('price:pk', kwargs={'pk': id}))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_users_not_admin(self):
         Profile.objects.all().update(is_admin=False)
         id = Price.objects.all()[0].id
-        response = self.client.delete(reverse('price_pk', kwargs={'pk': id}))
+        response = self.client.delete(reverse('price:pk', kwargs={'pk': id}))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

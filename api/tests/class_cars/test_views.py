@@ -2,6 +2,7 @@ from class_cars.models import *
 from class_cars.models import ClassCar
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User, Permission
+from django.urls import reverse
 from price.models import Price
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -42,15 +43,18 @@ class ClassNotAuth(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_class_not_auth_get(self):
+        # reverse('class:pk', kwargs={'pk': self.id_class})
+        # response = self.client.get('/class/')
+
         response = self.client.get('/class/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_class_not_auth(self):
-        response = self.client.get('/class/{}'.format(self.id_class))
+        response = self.client.get(reverse('class:pk', kwargs={'pk': self.id_class}))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_class_not_admin_delete(self):
-        response = self.client.delete('/class/{}'.format(self.id_class))
+        response = self.client.delete(reverse('class:pk', kwargs={'pk': self.id_class}))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
@@ -94,11 +98,11 @@ class ClassGetTest(PseudoAuth):
 
     def test_class(self):
         Profile.objects.all().update(is_admin=True)
-        response = self.client.get('/class/')
+        response = self.client.get(reverse('class:list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_class_not_admin(self):
-        response = self.client.get('/class/')
+        response = self.client.get(reverse('class:list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
@@ -107,12 +111,12 @@ class ClassGetTestPk(PseudoAuth):
     def test_class(self):
         Profile.objects.all().update(is_admin=True)
         id = ClassCar.objects.all()[0].id
-        response = self.client.get('/class/{}'.format(id))
+        response = self.client.get(reverse('class:pk', kwargs={'pk': id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_class_not_admin(self):
         id = ClassCar.objects.all()[0].id
-        response = self.client.get('/class/{}'.format(id))
+        response = self.client.get(reverse('class:pk', kwargs={'pk': id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
@@ -121,13 +125,13 @@ class ClassPatchTestPk(PseudoAuth):
     def test_class(self):
         Profile.objects.all().update(is_admin=True)
         id = ClassCar.objects.all()[0].id
-        response = self.client.patch('/class/{}'.format(id), data={"booking_time": 21, })
+        response = self.client.patch(reverse('class:pk', kwargs={'pk': id}), data={"booking_time": 21, })
         self.assertEqual(ClassCar.objects.get(pk=id).booking_time, 21)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_class_not_admin(self):
         id = ClassCar.objects.all()[0].id
-        response = self.client.patch('/class/{}'.format(id), data={"booking_time": 21, })
+        response = self.client.patch(reverse('class:pk', kwargs={'pk': id}), data={"booking_time": 21, })
         self.assertEqual(ClassCar.objects.get(pk=id).booking_time, 15)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -137,6 +141,6 @@ class ClassDeleteTestPk(PseudoAuth):
     def test_class(self):
         Profile.objects.all().update(is_admin=True)
         id = ClassCar.objects.all()[0].id
-        response = self.client.delete('/class/{}'.format(id))
+        response = self.client.delete(reverse('class:pk', kwargs={'pk': id}))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(ClassCar.objects.all()), 0)

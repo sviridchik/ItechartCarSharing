@@ -1,9 +1,11 @@
 from rest_framework import serializers
+from class_cars.serializers import ClassSerializer
 
 from .models import *
 
 
 class CarSerializer(serializers.ModelSerializer):
+    car_class = ClassSerializer(read_only=True)
 
     class Meta:
         model = Cars
@@ -13,6 +15,8 @@ class CarSerializer(serializers.ModelSerializer):
 
 
 class ViewedCarSerializer(serializers.ModelSerializer):
+    car = CarSerializer(read_only=True)
+
 
     class Meta:
         model = ViewedCars
