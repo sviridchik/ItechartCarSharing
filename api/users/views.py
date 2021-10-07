@@ -12,7 +12,6 @@ from rest_framework.views import APIView
 from .permissions import MyPermissionAdmin, MyPermissionPkME
 from .serializer import *
 
-<< << << < HEAD
 
 
 class ProfileList(generics.ListCreateAPIView):
