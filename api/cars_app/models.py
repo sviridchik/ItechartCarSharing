@@ -1,7 +1,7 @@
-from django.db import models
-from users.models import Profile
 from class_cars.models import ClassCar
+from django.db import models
 from main.models import BaseModel
+from users.models import Profile
 
 mark_choose = (
     ("Mercedes-Benz", "Mercedes-Benz"),
@@ -35,6 +35,13 @@ car_choose = (
 )
 
 
+class CarStatuses:
+    FREE = 'free'
+    UNAVALIABLE = 'unavaliable'
+    BOOKED = 'booked'
+    ACTIVE = 'active'
+
+
 # Create your models here.
 
 class Cars(BaseModel):
@@ -44,13 +51,14 @@ class Cars(BaseModel):
     color = models.CharField(max_length=255, choices=color_choose)
     year = models.IntegerField(blank=False)
     latitude = models.FloatField(blank=True)
-    status = models.CharField(max_length=255, choices=car_choose)
+    status = models.CharField(max_length=255, choices=(
+        ('free', CarStatuses.FREE), ('active', CarStatuses.ACTIVE), ('booked', CarStatuses.BOOKED),
+        ('unavaliable', CarStatuses.UNAVALIABLE)))
     car_class = models.ForeignKey(ClassCar, on_delete=models.SET_NULL, null=True)
     longitude = models.FloatField(blank=True)
 
 
 class ViewedCars(BaseModel):
-    # id = models.IntegerField(primary_key=True, auto_created=True, verbose_name='id')
     car = models.ForeignKey(Cars, on_delete=models.SET_NULL, null=True)
     price_day = models.IntegerField(blank=False)
     price_night = models.IntegerField(blank=False)
