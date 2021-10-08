@@ -43,12 +43,12 @@ class ProfileDetailList(RetrieveUpdateDestroyAPIView):
 
 
 
-def get_object(self):
-    if 'me' in self.kwargs:
-        pk = Profile.objects.get(user=self.request.user).pk
-    else:
-        pk = self.kwargs['pk']
-    try:
-        return Profile.objects.get(pk=pk)
-    except Profile.DoesNotExist:
-        return Response({"error": "Not found!"}, status=status.HTTP_404_NOT_FOUND)
+    def get_object(self):
+        if 'me' in self.kwargs:
+            pk = Profile.objects.get(user=self.request.user).pk
+        else:
+            pk = self.kwargs['pk']
+        try:
+            return Profile.objects.get(pk=pk)
+        except Profile.DoesNotExist:
+            return Response({"error": "Not found!"}, status=status.HTTP_404_NOT_FOUND)
