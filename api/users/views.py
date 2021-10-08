@@ -13,17 +13,17 @@ from .permissions import MyPermissionAdmin, MyPermissionPkME
 from .serializer import *
 
 
-
 class ProfileList(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated, MyPermissionAdmin)
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 
-    def post(self, request, *args, **kwargs):
-        birth_date = Profile.objects.get(user = request.user).date_of_birth
-        if (date.today() - birth_date) // timedelta(days=365.2425) <18:
-            return Response({"error": "under 18"},status.HTTP_400_BAD_REQUEST)
-        return self.create(request, *args, **kwargs)
+    # def post(self, request, *args, **kwargs):
+    #     birth_date = Profile.objects.get(user = request.user).date_of_birth
+    #     if (date.today() - birth_date) // timedelta(days=365.2425) <18:
+    #         return Response({"error": "under 18"},status.HTTP_400_BAD_REQUEST)
+    #     return self.create(request, *args, **kwargs)
+
 
 class SignUp(CreateAPIView):
     queryset = Profile.objects.all()
@@ -47,14 +47,12 @@ class ProfileDetailList(RetrieveUpdateDestroyAPIView):
         else:
             return ProfileSerializerRedused
 
-
-
-def get_object(self):
-    if 'me' in self.kwargs:
-        pk = Profile.objects.get(user=self.request.user).pk
-    else:
-        pk = self.kwargs['pk']
-    try:
-        return Profile.objects.get(pk=pk)
-    except Profile.DoesNotExist:
-        return Response({"error": "Not found!"}, status=status.HTTP_404_NOT_FOUND)
+    def get_object(self):
+        if 'me' in self.kwargs:
+            pk = Profile.objects.get(user=self.request.user).pk
+        else:
+            pk = self.kwargs['pk']
+        try:
+            return Profile.objects.get(pk=pk)
+        except Profile.DoesNotExist:
+            return Response({"error": "Not found!"}, status=status.HTTP_404_NOT_FOUND)
