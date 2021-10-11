@@ -4,7 +4,7 @@ from price.permissions import MyPermissionAdminNotUser
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.permissions import IsAuthenticated,AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from users.models import Profile
 
@@ -50,23 +50,23 @@ class FreeCarsList(generics.ListAPIView):
         free_cars = Cars.objects.filter(status="free")
 
         already_seen = []
-        cars_already_seen = ViewedCars.objects.all()
+        cars_already_seen = ViewedCars.objects.filter(user=user)
         for car in cars_already_seen:
             already_seen.append((car.user.id, car.car.id))
 
         for free_car in free_cars:
-            car_lat = free_car.latitude
-            car_lon = free_car.longitude
-            s = haversin(latitude, longitude, car_lat, car_lon)
-            if s <= distance and free_car.car_class.name == class_car:
+
+            if free_car.car_class.name == class_car and haversin(latitude, longitude, free_car.latitude,
+                                                                 free_car.longitude) <= distance:
+
                 data_viewed = {}
                 res.append(CarSerializer(free_car))
                 # res.append({'car': dict(CarSerializer(free_car).data), 'distance': s})
                 data_viewed['car'] = free_car.id
                 data_viewed['price_day'] = free_car.car_class.price.price_for_km
                 data_viewed['price_night'] = free_car.car_class.price.price_for_km + free_car.car_class.price.night_add
-                data_viewed['user'] = Profile.objects.get(user=user).id
-
+                # data_viewed['user'] = Profile.objects.get(user=user).id
+                data_viewed['user'] = user.id
                 data_viewed['booking_price'] = free_car.car_class.price.booking_price
                 if (data_viewed['car'], data_viewed['user']) not in already_seen:
                     serializer = ViewedCarSerializer(data=data_viewed)

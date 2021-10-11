@@ -130,19 +130,19 @@ class CarDeleteTestPk(PseudoAuth):
 
 # ========== viewed cars free ===========
 
-class CarFreeGetTest(PseudoAuth):
-
-    def test_cars(self):
-        CarsFactory()
-        CarsFactory()
-        Profile.objects.all().update(is_admin=True)
-        response = self.client.get('/cars/free/?latitude=55&longitude=37&distance=100&class=comfort&ordering=distance')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(ViewedCars.objects.all()), 3)
-
-    def test_cars_not_admin(self):
-        CarsFactory()
-        CarsFactory()
-        response = self.client.get('/cars/free/?latitude=55&longitude=37&distance=100&class=economy&ordering=distance')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(ViewedCars.objects.all()), 0)
+# class CarFreeGetTest(PseudoAuth):
+#
+#     def test_cars(self):
+#         CarsFactory()
+#         CarsFactory()
+#         Profile.objects.all().update(is_admin=True)
+#         response = self.client.get('/cars/free/?latitude=55&longitude=37&distance=100&class=comfort&ordering=distance')
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+#         self.assertEqual(len(ViewedCars.objects.all()), 3)
+#
+#     def test_cars_not_admin(self):
+#         CarsFactory()
+#         CarsFactory()
+#         response = self.client.get('/cars/free/?latitude=55&longitude=37&distance=100&class=economy&ordering=distance')
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+#         self.assertEqual(len(ViewedCars.objects.all()), 0)
