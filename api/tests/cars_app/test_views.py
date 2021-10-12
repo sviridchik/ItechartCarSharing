@@ -1,4 +1,4 @@
-from cars_app.models import Cars, ViewedCars
+from cars_app.models import Cars, ViewedCars, CarStatuses
 from class_cars.models import ClassCar
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User, Permission
@@ -41,11 +41,12 @@ class PseudoAuth(APITestCase):
 
 
 class CarPostTest(PseudoAuth):
+    view_name = 'cars:list'
     payload_car = {
         "level_consumption": 2,
         "mark": "Mercedes-Benz",
         "reg_number": "MP31523",
-        "color": "w",
+        "color": "white",
         "year": 2000,
         "latitude": 55.0,
         "status": "active",
@@ -55,91 +56,73 @@ class CarPostTest(PseudoAuth):
         Profile.objects.all().update(is_admin=True)
         id = ClassCar.objects.all()[0].id
         CarPostTest.payload_car["car_class"] = id
-        response = self.client.post(reverse('cars:list'), data=CarPostTest.payload_car)
+        response = self.client.post(reverse(self.view_name), data=CarPostTest.payload_car)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_price_not_admin(self):
         id = ClassCar.objects.all()[0].id
         CarPostTest.payload_car["car_class"] = id
-        response = self.client.post(reverse('cars:list'), data=CarPostTest.payload_car)
+        response = self.client.post(reverse(self.view_name), data=CarPostTest.payload_car)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-
-class CarGetTest(PseudoAuth):
-    payload_car = {
-        "level_consumption": 2,
-        "mark": "Mercedes-Benz",
-        "reg_number": "MP31523",
-        "color": "w",
-        "year": 2000,
-        "latitude": 55.0,
-        "status": "active",
-        "longitude": 37.0}
 
     def test_cars(self):
         id = ClassCar.objects.all()[0].id
         CarPostTest.payload_car["car_class"] = id
         Profile.objects.all().update(is_admin=True)
-        response = self.client.get(reverse('cars:list'))
+        response = self.client.get(reverse(self.view_name))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_cars_not_admin(self):
         id = ClassCar.objects.all()[0].id
         CarPostTest.payload_car["car_class"] = id
-        response = self.client.get(reverse('cars:list'))
+        response = self.client.get(reverse(self.view_name))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 class CarGetTestPk(PseudoAuth):
+    view_name = 'cars:detail'
 
     def test_price(self):
         Profile.objects.all().update(is_admin=True)
         id = Cars.objects.all()[0].id
-        response = self.client.get(reverse('cars:pk', kwargs={'pk': id}))
+        response = self.client.get(reverse(self.view_name, kwargs={'pk': id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_users_not_admin(self):
+    def test_cars_not_admin_detail(self):
         id = Cars.objects.all()[0].id
-        response = self.client.get(reverse('cars:pk', kwargs={'pk': id}))
+        response = self.client.get(reverse(self.view_name, kwargs={'pk': id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-
-class CarPatchTestPk(PseudoAuth):
 
     def test_cars(self):
         Profile.objects.all().update(is_admin=True)
         id = Cars.objects.all()[0].id
-        response = self.client.patch(reverse('cars:pk', kwargs={'pk': id}), data={"level_consumption": 10, })
+        response = self.client.patch(reverse(self.view_name, kwargs={'pk': id}), data={"level_consumption": 10, })
         self.assertEqual(Cars.objects.get(pk=id).level_consumption, 10)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-
-class CarDeleteTestPk(PseudoAuth):
-
-    def test_price(self):
+    def test_cars_detail(self):
         Profile.objects.all().update(is_admin=True)
         id = Cars.objects.all()[0].id
-        response = self.client.delete(reverse('cars:pk', kwargs={'pk': id}))
+        response = self.client.delete(reverse(self.view_name, kwargs={'pk': id}))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    def test_users_not_admin(self):
+    def test_cars_not_admin(self):
         id = Cars.objects.all()[0].id
-        response = self.client.delete(reverse('cars:pk', kwargs={'pk': id}))
+        response = self.client.delete(reverse(self.view_name, kwargs={'pk': id}))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
 
 # ========== viewed cars free ===========
 
-# class CarFreeGetTest(PseudoAuth):
-#
-#     def test_cars(self):
-#         CarsFactory()
-#         CarsFactory()
-#         Profile.objects.all().update(is_admin=True)
-#         response = self.client.get('/cars/free/?latitude=55&longitude=37&distance=100&class=comfort&ordering=distance')
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self.assertEqual(len(ViewedCars.objects.all()), 3)
-#
+class CarFreeGetTest(PseudoAuth):
+
+    def test_cars(self):
+        CarsFactory()
+        CarsFactory()
+        Profile.objects.all().update(is_admin=True)
+        response = self.client.get('/cars/free/?latitude=55&longitude=37&distance=100&class=comfort&ordering=distance')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(ViewedCars.objects.all()), 3)
+
 #     def test_cars_not_admin(self):
 #         CarsFactory()
 #         CarsFactory()

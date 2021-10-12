@@ -8,10 +8,10 @@ app_name = "cars"
 urlpatterns = [
 
     path('/', views.CarList.as_view(), name='list'),
-    re_path(pk_reg, views.CarListDetail.as_view(), name='pk'),
-    path('/free/', views.FreeCarsList, name='free'),
-    path('/view/', views.ViewedCarList.as_view(), name='view'),
-    re_path('/view/' + pk_reg,
+    re_path(pk_reg, views.CarListDetail.as_view(), name='detail'),
+    path('/free/', views.get_free_cars, name='free'),
+    path('^/view/$', views.ViewedCarList.as_view(), name='view'),
+    re_path('^/view/' + pk_reg+'$',
             views.ViewedCarListDetail.as_view(), name='view_pk'),
 
 ]

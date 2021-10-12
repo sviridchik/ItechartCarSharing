@@ -3,35 +3,60 @@ from django.db import models
 from main.models import BaseModel
 from users.models import Profile
 
+
+class Marks:
+    M = "Mercedes-Benz"
+    T = "Toyota"
+    H = "Honda"
+
+
 mark_choose = (
-    ("Mercedes-Benz", "Mercedes-Benz"),
-    ("Toyota", "Toyota"),
-    ("Honda", "Honda"),
+    (Marks.M, "Mercedes-Benz"),
+    (Marks.T, "Toyota"),
+    (Marks.H, "Honda"),
 )
+
+
+class Colors:
+    y = "yellow"
+    w = "white"
+    g = "green"
+
 
 color_choose = (
-    ("y", "yellow"),
-    ("w", "white"),
-    ("g", "green"),
+    (Colors.y, "yellow"),
+    (Colors.w, "white"),
+    (Colors.g, "green"),
 )
+
+
+class Statuses:
+    BOOKED = 'booked'
+    FINISHED = 'finished'
+    ACTIVE = 'active'
+
 
 status_choose = (
-    ("active", "active"),
-    ("finished", "finished"),
-    ("booked", "booked"),
+    (Statuses.ACTIVE, "active"),
+    (Statuses.FINISHED, "finished"),
+    (Statuses.BOOKED, "booked"),
 )
 
+
+class LogStatuses:
+    ACTIVE = "active"
+    FINISHED = "finished"
+    BOOKED = "booked"
+    STOP = "stop"
+    START = "start"
+
+
 log_choose = (
-    ("active", "active"),
-    ("finished", "finished"),
-    ("booked", "booked"),
-    ("stop", "stop"),
-    ("start", "start"),
-)
-car_choose = (
-    ("active", "active"),
-    ("free", "free"),
-    ("booked", "booked"),
+    (LogStatuses.ACTIVE, "active"),
+    (LogStatuses.FINISHED, "finished"),
+    (LogStatuses.BOOKED, "booked"),
+    (LogStatuses.STOP, "stop"),
+    (LogStatuses.START, "start"),
 )
 
 
@@ -40,6 +65,13 @@ class CarStatuses:
     UNAVALIABLE = 'unavaliable'
     BOOKED = 'booked'
     ACTIVE = 'active'
+
+
+car_choose = (
+    (CarStatuses.FREE, 'free'),
+    (CarStatuses.ACTIVE, 'active'),
+    (CarStatuses.BOOKED, 'booked'),
+    (CarStatuses.UNAVALIABLE, 'unavaliable'))
 
 
 # Create your models here.
@@ -51,9 +83,7 @@ class Cars(BaseModel):
     color = models.CharField(max_length=255, choices=color_choose)
     year = models.IntegerField(blank=False)
     latitude = models.FloatField(blank=True)
-    status = models.CharField(max_length=255, choices=(
-        ('free', CarStatuses.FREE), ('active', CarStatuses.ACTIVE), ('booked', CarStatuses.BOOKED),
-        ('unavaliable', CarStatuses.UNAVALIABLE)))
+    status = models.CharField(max_length=255, choices=car_choose)
     car_class = models.ForeignKey(ClassCar, on_delete=models.SET_NULL, null=True)
     longitude = models.FloatField(blank=True)
 

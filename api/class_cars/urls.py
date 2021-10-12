@@ -12,5 +12,5 @@ app_name = "class"
 
 urlpatterns = [
     path('/', views.ClassList.as_view(), name="list"),
-    re_path(pk_reg, views.ClassListDetail.as_view(), name="pk")
+    re_path(pk_reg, views.ClassListDetail.as_view(), name="detail")
 ]

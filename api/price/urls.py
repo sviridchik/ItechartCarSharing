@@ -4,7 +4,7 @@ from price import views
 app_name = "price"
 
 urlpatterns = [
-    path('/', views.PriceList.as_view(), name='list'),
+    path('^/$', views.PriceList.as_view(), name='list'),
     re_path(pk_reg,
-            views.PriceListDetail.as_view(), name='pk'),
+            views.PriceListDetail.as_view(), name='detail'),
 ]
