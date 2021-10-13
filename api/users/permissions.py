@@ -8,7 +8,7 @@ class MyPermissionAdmin(BasePermission):
         if request.method == 'POST':
             return True
         user = request.user
-        user_profile = Profile.objects.get(user=user)
+        user_profile = user.profile
 
         if not user_profile.is_admin:
             return False
@@ -29,7 +29,7 @@ class MyPermissionAge(BasePermission):
 
 class MyPermissionPkME(BasePermission):
     def has_permission(self, request, view):
-        user_profile = Profile.objects.get(user=request.user)
+        user_profile = request.user.profile
 
         pk = view.kwargs.get('pk')
         me = view.kwargs.get('me')
