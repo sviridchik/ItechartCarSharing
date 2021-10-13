@@ -10,7 +10,7 @@ from users.models import Profile
 
 from .models import CarStatuses
 from .models import Cars, ViewedCars
-from .serializer import ViewedCarSerializer, CarSerializer, ParamsSerializer
+from .serializer import ViewedCarSerializer, CarSerializer, ParamsSerializer,FreeViewedCarSerializer
 from .utils import haversin
 
 
@@ -45,14 +45,15 @@ def get_free_cars(request):
     serializer_params = ParamsSerializer(process_data).data
     disc_flag = False
     user = request.user
+    profile = user.profile
 
     res = []
     free_cars = Cars.objects.filter(status=CarStatuses.FREE)
 
-    already_seen = []
-    cars_already_seen = ViewedCars.objects.all()
-    for car in cars_already_seen:
-        already_seen.append((car.user.id, car.car.id))
+    # уже неважно
+    already_seen = len(ViewedCars.objects.all())
+    if already_seen > 0:
+        already_seen.delete()
 
     for free_car in free_cars:
         car_lat = free_car.latitude
@@ -60,22 +61,21 @@ def get_free_cars(request):
         s = haversin(serializer_params['latitude'], serializer_params['longitude'], car_lat, car_lon)
         if s <= serializer_params['distance'] and free_car.car_class.name == serializer_params['class_car']:
             data_viewed = {}
-            res.append({"car": dict(CarSerializer(free_car).data), "distance": s})
+            # res.append({"car": dict(CarSerializer(free_car).data), "distance": s})
+            res.append({"car": free_car, "distance": s})
             data_viewed['car'] = free_car.id
             data_viewed['price_day'] = free_car.car_class.price.price_for_km
             data_viewed['price_night'] = free_car.car_class.price.price_for_km + free_car.car_class.price.night_add
-            data_viewed['user'] = Profile.objects.get(user=user).id
-
+            data_viewed['user'] = profile.id
             data_viewed['booking_price'] = free_car.car_class.price.booking_price
-            if (data_viewed['car'], data_viewed['user']) not in already_seen:
-                serializer = ViewedCarSerializer(data=data_viewed)
-                if serializer.is_valid():
-                    serializer.save()
+            serializer = ViewedCarSerializer(data=data_viewed)
+            if serializer.is_valid():
+                serializer.save()
     if serializer_params['ordering'][0] == '-':
         disc_flag = True
-
+    data_res = FreeViewedCarSerializer(res,many = True)
     res.sort(key=lambda el: el["distance"], reverse=disc_flag)
-    return Response(res, status=status.HTTP_200_OK)
+    return Response(data_res.data, status=status.HTTP_200_OK)
     # return res
 
 

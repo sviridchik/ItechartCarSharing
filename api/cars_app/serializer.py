@@ -29,3 +29,8 @@ class ParamsSerializer(serializers.Serializer):
     distance = serializers.FloatField()
     class_car = serializers.CharField()
     ordering = serializers.CharField()
+
+
+class FreeViewedCarSerializer(serializers.Serializer):
+    car = CarSerializer(read_only=True)
+    distance = serializers.FloatField()
