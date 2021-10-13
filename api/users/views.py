@@ -41,8 +41,6 @@ class ProfileDetailList(RetrieveUpdateDestroyAPIView):
         else:
             return ProfileSerializerRedused
 
-
-
     def get_object(self):
         if 'me' in self.kwargs:
             pk = Profile.objects.get(user=self.request.user).pk

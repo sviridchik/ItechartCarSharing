@@ -17,7 +17,7 @@ class MyAuthTest(APITestCase):
         self.password = 'test123123'
         self.client.post(reverse('signup'),
                          data={'username': self.login, 'password': self.password, 'dtp_times': 9,
-                               'email': 'test@gmail.com', 'date_of_birth': "2003-09-09"})
+                               'email': 'test@gmail.com', 'date_of_birth': "2000-09-09"})
         response = self.client.post(reverse('signin'), data={'username': self.login, 'password': self.password})
         self.token = response.data['access']
         self.api_authentication()
