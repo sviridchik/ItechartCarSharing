@@ -29,7 +29,3 @@ class ParamsSerializer(serializers.Serializer):
     distance = serializers.FloatField()
     class_car = serializers.CharField()
     ordering = serializers.CharField()
-
-    def create(self, validated_data):
-        a = 9
-        return Comment(**validated_data)

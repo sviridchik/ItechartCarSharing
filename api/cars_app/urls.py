@@ -11,7 +11,7 @@ urlpatterns = [
     re_path(pk_reg, views.CarListDetail.as_view(), name='detail'),
     path('/free/', views.get_free_cars, name='free'),
     path('^/view/$', views.ViewedCarList.as_view(), name='view'),
-    re_path('^/view/' + pk_reg+'$',
+    re_path('^/view/' + pk_reg + '$',
             views.ViewedCarListDetail.as_view(), name='view_pk'),
 
 ]

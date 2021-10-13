@@ -1,6 +1,7 @@
 from cars.urls import pk_reg
 from django.urls import path, re_path
 from price import views
+
 app_name = "price"
 
 urlpatterns = [

@@ -28,6 +28,7 @@ class PseudoAuth(APITestCase):
 
 class ClassNotAuth(APITestCase):
     view_name = 'class:detail'
+
     def setUp(self):
         ProfileFactory()
         ClassFactory()
@@ -43,9 +44,6 @@ class ClassNotAuth(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_class_not_auth_get(self):
-        # reverse('class:pk', kwargs={'pk': self.id_class})
-        # response = self.client.get('/class/')
-
         response = self.client.get('/class/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
