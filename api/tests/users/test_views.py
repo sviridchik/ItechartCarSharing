@@ -5,9 +5,11 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from users.models import Profile
-# from users.models import Profile
 
 from .factories import ProfileFactory
+
+
+# from users.models import Profile
 
 
 class MyAuthTest(APITestCase):
@@ -17,7 +19,7 @@ class MyAuthTest(APITestCase):
         self.password = 'test123123'
         self.client.post(reverse('signup'),
                          data={'username': self.login, 'password': self.password, 'dtp_times': 9,
-                               'email': 'test@gmail.com', 'date_of_birth': "2003-09-09"})
+                               'email': 'test@gmail.com', 'date_of_birth': "2000-09-09"})
         response = self.client.post(reverse('signin'), data={'username': self.login, 'password': self.password})
         self.token = response.data['access']
         self.api_authentication()
@@ -123,6 +125,8 @@ class UserGetTestMe(PseudoAuth):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
+#
+
 class UserGetTestPk(PseudoAuth):
 
     def test_users(self):
@@ -152,6 +156,7 @@ class UserGetTestPkNotGood(PseudoAuth):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
+#
 class UserPatchTestMe(PseudoAuth):
 
     def test_users(self):
@@ -204,11 +209,11 @@ class UserDeleteTestMe(PseudoAuth):
 
 
 class UserDeleteTestPk(PseudoAuth):
+    view_name = 'users:users_pk'
 
     def test_users(self):
         Profile.objects.all().update(is_admin=True)
         self.user_id = Profile.objects.all()[0].id
-
         response = self.client.delete('/users/{}'.format(self.user_id))
         self.assertEqual(len(Profile.objects.all()), 0)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

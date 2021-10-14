@@ -1,38 +1,77 @@
-from django.db import models
-from users.models import Profile
 from class_cars.models import ClassCar
+from django.db import models
 from main.models import BaseModel
+from users.models import Profile
+
+
+class Marks:
+    M = "Mercedes-Benz"
+    T = "Toyota"
+    H = "Honda"
+
 
 mark_choose = (
-    ("Mercedes-Benz", "Mercedes-Benz"),
-    ("Toyota", "Toyota"),
-    ("Honda", "Honda"),
+    (Marks.M, "Mercedes-Benz"),
+    (Marks.T, "Toyota"),
+    (Marks.H, "Honda"),
 )
+
+
+class Colors:
+    y = "yellow"
+    w = "white"
+    g = "green"
+
 
 color_choose = (
-    ("y", "yellow"),
-    ("w", "white"),
-    ("g", "green"),
+    (Colors.y, "yellow"),
+    (Colors.w, "white"),
+    (Colors.g, "green"),
 )
+
+
+class Statuses:
+    BOOKED = 'booked'
+    FINISHED = 'finished'
+    ACTIVE = 'active'
+
 
 status_choose = (
-    ("active", "active"),
-    ("finished", "finished"),
-    ("booked", "booked"),
+    (Statuses.ACTIVE, "active"),
+    (Statuses.FINISHED, "finished"),
+    (Statuses.BOOKED, "booked"),
 )
 
+
+class LogStatuses:
+    ACTIVE = "active"
+    FINISHED = "finished"
+    BOOKED = "booked"
+    STOP = "stop"
+    START = "start"
+
+
 log_choose = (
-    ("active", "active"),
-    ("finished", "finished"),
-    ("booked", "booked"),
-    ("stop", "stop"),
-    ("start", "start"),
+    (LogStatuses.ACTIVE, "active"),
+    (LogStatuses.FINISHED, "finished"),
+    (LogStatuses.BOOKED, "booked"),
+    (LogStatuses.STOP, "stop"),
+    (LogStatuses.START, "start"),
 )
+
+
+class CarStatuses:
+    FREE = 'free'
+    UNAVALIABLE = 'unavaliable'
+    BOOKED = 'booked'
+    ACTIVE = 'active'
+
+
 car_choose = (
-    ("active", "active"),
-    ("free", "free"),
-    ("booked", "booked"),
-)
+    (CarStatuses.FREE, 'free'),
+    (CarStatuses.ACTIVE, 'active'),
+    (CarStatuses.BOOKED, 'booked'),
+    (CarStatuses.UNAVALIABLE, 'unavaliable'))
 
 
 # Create your models here.
@@ -50,7 +89,6 @@ class Cars(BaseModel):
 
 
 class ViewedCars(BaseModel):
-    # id = models.IntegerField(primary_key=True, auto_created=True, verbose_name='id')
     car = models.ForeignKey(Cars, on_delete=models.SET_NULL, null=True)
     price_day = models.IntegerField(blank=False)
     price_night = models.IntegerField(blank=False)
