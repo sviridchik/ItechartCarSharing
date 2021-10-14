@@ -14,7 +14,6 @@ from .permissions import MyPermissionAdmin, MyPermissionPkME
 from .serializer import ProfileSerializer, ProfileSerializerRedused, LogoutSerializer
 
 
-# Create your views here.
 
 class ProfileList(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated, MyPermissionAdmin)

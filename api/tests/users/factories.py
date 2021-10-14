@@ -18,4 +18,4 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
     user = factory.SubFactory(UserFactory)
     dtp_times = 9
-    date_of_birth = '2003-09-09'
+    date_of_birth = '2000-09-09'
