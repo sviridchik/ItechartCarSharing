@@ -214,9 +214,6 @@ class UserDeleteTestPk(PseudoAuth):
     def test_users(self):
         Profile.objects.all().update(is_admin=True)
         self.user_id = Profile.objects.all()[0].id
-
-        # response = self.client.delete(reverse(self.view_name, kwargs={'pk': self.user_id}))
-
         response = self.client.delete('/users/{}'.format(self.user_id))
         self.assertEqual(len(Profile.objects.all()), 0)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
