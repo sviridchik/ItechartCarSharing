@@ -5,13 +5,7 @@ from django.shortcuts import render
 class TripList(RetrieveAPIView):
     queryset = Trip.objects.all()
     serializer_class = TripSerializer
-
     permission_classes = (IsAuthenticated)
-
-    # def get(self, request, format=None):
-    #     trip = Trip.objects.all()
-    #     serializer = TripSerializer(trip, many=True)
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
 
     # -------------- trip price ---------------------
 
@@ -33,8 +27,6 @@ class TripPriceListDetail(APIView):
     permission_classes = (IsAuthenticated)
 
     def get_object(self, pk):
-        # Returns an object instance that should
-        # be used for detail views.
         try:
             return TripPrice.objects.get(pk=pk)
         except TripPrice.DoesNotExist:

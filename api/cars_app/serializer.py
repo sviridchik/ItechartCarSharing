@@ -15,7 +15,7 @@ class CarSerializer(serializers.ModelSerializer):
 
 
 class ViewedCarSerializer(serializers.ModelSerializer):
-    car = CarSerializer(read_only=True)
+    # car = CarSerializer()
 
     class Meta:
         model = ViewedCars

@@ -7,10 +7,13 @@ from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from users.models import Profile
-
+import datetime
 from .models import CarStatuses
 from .models import Cars, ViewedCars
 from .serializer import ViewedCarSerializer, CarSerializer, ParamsSerializer, FreeViewedCarSerializer
+from trip.serializer import TripSerializer,TripPriceSerializer,TripLogSerializer
+from trip.models import TripPrice,Trip,TripLog
+
 from .utils import haversin
 
 
@@ -93,23 +96,24 @@ class ViewedCarListDetail(generics.DestroyAPIView):
 #     -------------- book -----------------------
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def to_book(request, pk):
+# @permission_classes([IsAuthenticated])
+def to_book(request,pk):
     user = request.user
     # car status change
-    Cars.objects.filter(pk=pk).update(status="free")
+    # Cars.objects.filter(pk=pk).update(status=CarStatuses.FREE)
 
     try:
-        car = Cars.objects.get(pk=pk)
-        if car.status != "free":
+        car = ViewedCars.objects.get(pk=pk).car
+        if car.status != CarStatuses.FREE:
             return Response({"error": "this car is not free"}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error": e.args[0]}, status=status.HTTP_400_BAD_REQUEST)
-    Cars.objects.filter(pk=pk).update(status="booked")
+
+    Cars.objects.filter(pk=car.id).update(status="booked")
 
     # create trip price
-    user_profile = Profile.objects.get(user=user)
-    viewd_car = ViewedCars.objects.filter(user=user_profile, car=pk)
+    user_profile = user.profile
+    viewd_car = ViewedCars.objects.filter(user=user_profile, car=car.id)
     if len(viewd_car) == 0:
         return Response({"error": "no unavailable cars"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -123,17 +127,15 @@ def to_book(request, pk):
         serializer.save()
 
     # del viewed cars
-    cars = ViewedCars.objects.all()
-    for c in cars:
-        c.delete()
+    ViewedCars.objects.filter(user = user_profile).delete()
+
 
     # create trip
     pk_trip_price = TripPrice.objects.latest('id')
     data_trip = {
         'is_active': True,
         'user': Profile.objects.get(user=user).id,
-        # 'user' : None,
-        'car': pk,
+        'car': car.id,
         'trip_price': pk_trip_price.id,
         'is_booked': True
     }
