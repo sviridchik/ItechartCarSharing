@@ -6,10 +6,10 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from tests.users.factories import ProfileFactory
+from trip.models import TripPrice, Trip, TripLog
 from users.models import Profile
-from trip.models import TripPrice,Trip,TripLog
 
-from .factories import CarsFactory,CarsFactoryTest
+from .factories import CarsFactory, CarsFactoryTest
 
 
 # class NotAuthCarsTest(APITestCase):
@@ -39,6 +39,7 @@ class PseudoAuth(APITestCase):
         for p in permission:
             self.user.user_permissions.add(p)
         CarsFactory()
+
 
 #
 # class CarPostTest(PseudoAuth):
@@ -137,6 +138,7 @@ class CarFreeGetTest(PseudoAuth):
             '/cars/free/?latitude=55&longitude=37&distance=100&class_car=economy&ordering=distance')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(ViewedCars.objects.all()), 0)
+
 
 class Car_book_test(PseudoAuth):
     #

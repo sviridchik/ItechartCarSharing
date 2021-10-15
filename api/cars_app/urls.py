@@ -13,6 +13,6 @@ urlpatterns = [
     path('^/view/$', views.ViewedCarList.as_view(), name='view'),
     re_path('^/view/' + pk_reg + '$',
             views.ViewedCarListDetail.as_view(), name='view_pk'),
-    re_path('/'+pk_reg+'/book', views.to_book),
+    re_path('/'+pk_reg+'/book', views.Booking.as_view()),
 
 ]
