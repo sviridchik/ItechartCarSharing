@@ -1,8 +1,19 @@
+import datetime
 from django.shortcuts import render
+from math import cos, asin, sqrt, pi
+from price.permissions import MyPermissionAdminNotUser
+from rest_framework import generics
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from trip.models import TripPrice, Trip, TripLog
+from trip.serializer import TripSerializer, TripPriceSerializer, TripLogSerializer
 
 
 # Create your views here.
-class TripList(RetrieveAPIView):
+class TripList(generics.RetrieveAPIView):
     queryset = Trip.objects.all()
     serializer_class = TripSerializer
     permission_classes = (IsAuthenticated)
@@ -10,49 +21,20 @@ class TripList(RetrieveAPIView):
     # -------------- trip price ---------------------
 
 
-class TripPriceList(CreateAPIView):
+class TripPriceList(generics.CreateAPIView):
     queryset = TripPrice.objects.all()
     serializer_class = TripPriceSerializer
     permission_classes = (IsAuthenticated)
 
-    def get(self, request, format=None):
-        trip = TripPrice.objects.all()
-        serializer = TripPriceSerializer(trip, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-class TripPriceListDetail(APIView):
+class TripPriceListDetail(generics.RetrieveDestroyAPIView):
     queryset = TripPrice.objects.all()
     serializer_class = TripPriceSerializer
     permission_classes = (IsAuthenticated)
-
-    def get_object(self, pk):
-        try:
-            return TripPrice.objects.get(pk=pk)
-        except TripPrice.DoesNotExist:
-            return Response({"error": "there is no such price"}, status=status.HTTP_400_BAD_REQUEST)
-
-    def get(self, request, pk):
-        car = self.get_object(pk)
-        serializer = TripPriceSerializer(car)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def delete(self, request, pk, format=None):
-        if not self.is_admin(request=request):
-            return Response({"error": "no rights"}, status=status.HTTP_401_UNAUTHORIZED)
-        car = self.get_object(pk)
-
-        car.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # -------------- trip log ---------------------
-class LogList(CreateAPIView):
+class LogList(generics.RetrieveAPIView):
     queryset = TripLog.objects.all()
     serializer_class = TripLogSerializer
     permission_classes = [IsAuthenticated]
-
-    def get(self, request, format=None):
-        trip = TripLog.objects.all()
-        serializer = TripLogSerializer(trip, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)

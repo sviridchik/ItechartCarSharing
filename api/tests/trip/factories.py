@@ -1,6 +1,6 @@
 import factory
+from tests.trip.factories import TripPrice, Trip, TripLog
 from trip.models import Cars
-from tests.trip.factories import TripPrice,Trip,TripLog
 
 
 class TripPriceFactory(factory.django.DjangoModelFactory):
