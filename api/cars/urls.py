@@ -17,11 +17,14 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import path, include
 
+pk_reg = '(?P<pk>[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path(r'users', include('users.urls')),
     path(r'price', include('price.urls')),
     path(r'class', include('class_cars.urls')),
+    path(r'cars', include('cars_app.urls')),
     path(r'', include('main.urls')),
 
 ]

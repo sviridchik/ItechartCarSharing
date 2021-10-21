@@ -1,10 +1,11 @@
+from cars.urls import pk_reg
 from django.urls import path, re_path
-
-
 from price import views
 
+app_name = "price"
+
 urlpatterns = [
-    path('/', views.PriceList.as_view(), name='prices'),
-    re_path('(?P<pk>[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})',
-            views.PriceListDetail.as_view(), name='price_pk'),
+    path('^/$', views.PriceList.as_view(), name='list'),
+    re_path(pk_reg,
+            views.PriceListDetail.as_view(), name='detail'),
 ]

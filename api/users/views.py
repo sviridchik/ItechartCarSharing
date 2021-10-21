@@ -9,8 +9,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .models import Profile
 from .permissions import MyPermissionAdmin, MyPermissionPkME
-from .serializer import *
+from .serializer import ProfileSerializer, ProfileSerializerRedused, LogoutSerializer
+
 
 
 class ProfileList(generics.ListCreateAPIView):
