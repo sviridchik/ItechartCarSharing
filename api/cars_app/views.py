@@ -14,6 +14,7 @@ from .serializer import ViewedCarSerializer, CarSerializer, ParamsSerializer, Fr
 from .utils import haversin
 
 
+
 class CarList(generics.ListCreateAPIView):
     queryset = Cars.objects.all()
     serializer_class = CarSerializer
@@ -52,11 +53,7 @@ class FreeViewedCarsList(generics.ListAPIView):
 
         res = []
         free_cars = Cars.objects.filter(status=CarStatuses.FREE)
-
-        # уже неважно
-        already_seen = len(ViewedCars.objects.filter(user=profile))
-        if already_seen > 0:
-            already_seen.delete()
+        ViewedCars.objects.filter(user=profile).delete()
 
         for free_car in free_cars:
             car_lat = free_car.latitude
@@ -65,16 +62,22 @@ class FreeViewedCarsList(generics.ListAPIView):
             if s <= serializer_params['distance'] and free_car.car_class.name == serializer_params['class_car']:
                 data_viewed = {}
                 res.append({"car": free_car, "distance": s})
-                data_viewed['car'] = free_car.id
-                data_viewed['price_day'] = free_car.car_class.price.price_for_km
-                data_viewed['price_night'] = free_car.car_class.price.price_for_km + free_car.car_class.price.night_add
-                data_viewed['user'] = profile.id
-                data_viewed['booking_price'] = free_car.car_class.price.booking_price
-                serializer = ViewedCarSerializer(data=data_viewed)
-                if serializer.is_valid():
-                    serializer.save()
-        data_res = FreeViewedCarSerializer(res, many=True)
-        return Response(data_res.data, status=status.HTTP_200_OK)
+                res = ViewedCarSerializer({'car':free_car})
+                x = 6
+                pass
+                # FreeViewedCarSerializer(**{"car": free_car,'price_day':free_car.car_class.price.price_for_km})
+        #         data_viewed['car'] = free_car.id
+        #         data_viewed['price_day'] = free_car.car_class.price.price_for_km
+        #         data_viewed['price_night'] = free_car.car_class.price.price_for_km + free_car.car_class.price.night_add
+        #         data_viewed['user'] = profile.id
+        #         data_viewed['booking_price'] = free_car.car_class.price.booking_price
+        #         serializer = ViewedCarSerializer(data=data_viewed)
+        #         if serializer.is_valid():
+        #             serializer.save()
+        # data_res = FreeViewedCarSerializer(res, many=True)
+        # return Response(data_res.data, status=status.HTTP_200_OK)
+        return Response({}, status=status.HTTP_200_OK)
+
 
 
 # -------- Viewed cars -----------
