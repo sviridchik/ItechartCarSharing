@@ -9,9 +9,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .models import Profile
 from .permissions import MyPermissionAdmin, MyPermissionPkME
-from .serializer import *
+from .serializer import ProfileSerializer, ProfileSerializerRedused, LogoutSerializer
 
+
+# Create your views here.
 
 class ProfileList(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated, MyPermissionAdmin)

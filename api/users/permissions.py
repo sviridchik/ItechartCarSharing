@@ -8,7 +8,7 @@ class MyPermissionAdmin(BasePermission):
         if request.method == 'POST':
             return True
         user = request.user
-        user_profile = user.profile
+        user_profile = Profile.objects.get(user = user)
 
         if not user_profile.is_admin:
             return False
