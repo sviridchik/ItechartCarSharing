@@ -1,4 +1,5 @@
 # Create your views here.
+import datetime
 from math import cos, asin, sqrt, pi
 from price.permissions import MyPermissionAdminNotUser
 from rest_framework import generics
@@ -6,11 +7,14 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from trip.models import TripPrice, Trip, TripLog
+from trip.serializer import TripSerializer, TripPriceSerializer, TripLogSerializer
 from users.models import Profile
 
 from .models import CarStatuses
 from .models import Cars, ViewedCars
 from .serializer import ViewedCarSerializer, CarSerializer, ParamsSerializer, FreeViewedCarSerializer
+from .services import booking_logic
 from .utils import haversin
 
 
@@ -91,3 +95,13 @@ class ViewedCarListDetail(generics.DestroyAPIView):
     queryset = ViewedCars.objects.all()
     serializer_class = ViewedCarSerializer
     permission_classes = (IsAuthenticated)
+
+
+#     -------------- book -----------------------
+class Booking(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = FreeViewedCarSerializer
+
+    def post(self, request, *args, **kwargs):
+        booking_logic(request, *args, **kwargs)
+        return Response({})

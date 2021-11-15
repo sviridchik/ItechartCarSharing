@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'class_cars',
     'cars_app',
     'djoser',
+    'trip',
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
 
@@ -103,6 +104,8 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
